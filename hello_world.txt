@@ -2,7 +2,7 @@
 
 int main()
 {
-	std::cout << "Hello, in Git!" << std::endl;
+	std::cout << "Hello, World in Git!" << std::endl;
 
 	std::cout << "First Push Operation Successful And Do it again!" << std::endl;	
 	
