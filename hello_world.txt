@@ -3,6 +3,8 @@
 int main()
 {
 	std::cout << "Hello, Git!" << std::endl;
-	
+
+	std::cout << "First Push Operation Successful And Do it again!" << std::endl;	
+
 	return 0;
 }
