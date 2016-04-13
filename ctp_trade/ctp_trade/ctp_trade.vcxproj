@@ -160,16 +160,21 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CandleBar.h" />
+    <ClInclude Include="EfficientMap.h" />
     <ClInclude Include="MdBroadCast.h" />
     <ClInclude Include="MdManager.h" />
     <ClInclude Include="RedisWrapper.h" />
     <ClInclude Include="SolveReDefinition.h" />
+    <ClInclude Include="Strategy.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CandleBar.cpp" />
     <ClCompile Include="ctp_trade.cpp" />
     <ClCompile Include="MdBroadcast.cpp" />
     <ClCompile Include="MdManager.cpp" />
     <ClCompile Include="RedisWrapper.cpp" />
+    <ClCompile Include="Strategy.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

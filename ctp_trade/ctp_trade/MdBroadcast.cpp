@@ -1,5 +1,38 @@
 #include "MdBroadcast.h"
 
+
+void	CMdBroadCast::notify_mtk_data(mtk_data* data)
+{
+	for (auto strategy : list_)
+	{
+		instr_container ins = strategy->get_focused_instr();
+		auto ins_it = std::find(ins.begin(), ins.end(), data->InstrumentID);
+		if (ins_it != ins.end())
+		{
+			strategy->update(data);
+		}
+	}
+}
+
+void	CMdBroadCast::attach_observer(CStrategy* stg)
+{
+	list_.emplace_back(std::shared_ptr<CStrategy>(stg));
+}
+
+void	CMdBroadCast::dettach_observer(CStrategy* stg)
+{
+	auto list_it = std::find(list_.begin(), list_.end(), std::shared_ptr<CStrategy>(stg));
+	if (list_it != list_.end())
+	{
+		list_.erase(list_it);
+	}
+}
+
+const  strategy_list& CMdBroadCast::get_strategy_list() const
+{
+	return list_;
+}
+
 bool CMdBroadCast::initial_md_broadcast()
 {
 	bool md_ret = true;
@@ -50,32 +83,6 @@ bool CMdBroadCast::subscribe_instruments(char* *needed_ins, int ins_count)
 	return sub_ret;
 }
 
-size_t CMdBroadCast::get_mtk_size()
-{
-	std::lock_guard<std::mutex> lck(mtx_);
-	return mtk_queue_.size();
-}
-
-const mtk_type CMdBroadCast::get_mtk_head()
-{
-	std::lock_guard<std::mutex> lck(mtx_);
-	return mtk_queue_.front();
-}
-
-void  CMdBroadCast::pop_mtk_head()
-{
-	std::lock_guard<std::mutex> lck(mtx_);
-	mtk_queue_.pop_front();
-}
-
-std::deque<mtk_type>  CMdBroadCast::get_mtk_queue()
-{
-	std::lock_guard<std::mutex> lck(mtx_);
-	std::deque<mtk_type> temp_one(mtk_queue_.begin(), mtk_queue_.end());
-	mtk_queue_.clear();
-	return temp_one;
-}
-
 
 /*****************************spi»Øµ÷º¯Êý\***********************************************/
 void CMdBroadCast::OnFrontConnected() 
@@ -102,10 +109,9 @@ void CMdBroadCast::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CT
 }
 
 
-void CMdBroadCast::OnRtnDepthMarketData(mtk_type *pDepthMarketData)
+void CMdBroadCast::OnRtnDepthMarketData(mtk_data *pDepthMarketData)
 {
 	// I  Prefer To Store Market Data Directly Here Than To Do Any Process, Especially Time-Consuming One.
-	std::lock_guard<std::mutex> lck(mtx_);
-	mtk_queue_.emplace_back(*pDepthMarketData);
 	// Using Producer And Consumer Pattern and Do As The Only One Producer.
+	notify_mtk_data(pDepthMarketData);
 }

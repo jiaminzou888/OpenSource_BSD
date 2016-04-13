@@ -27,30 +27,56 @@ void CRedisWrapper::free_redis_instance()
 	}
 }
 
-bool CRedisWrapper::execute_one_operation(const char* command)
+
+/*
+#define REDIS_REPLY_STRING 1
+#define REDIS_REPLY_ARRAY 2
+#define REDIS_REPLY_INTEGER 3
+#define REDIS_REPLY_NIL 4
+#define REDIS_REPLY_STATUS 5
+#define REDIS_REPLY_ERROR 6
+*/
+bool CRedisWrapper::execute_one_operation(const char* command, size_t need_num, std::vector<std::string>* reply_strs)
 {
 	bool execute_ret = true;
 
-	reply_ = (redisReply *)redisCommand(connect_, command);
+	redisReply* reply = (redisReply *)redisCommand(connect_, command);
 
-	if (strncmp(reply_.load()->str, "OK", reply_.load()->len))
+	size_t reply_flag = reply->type;
+	switch (reply_flag)
+	{
+	case REDIS_REPLY_ERROR:
 	{
 		execute_ret = false;
 	}
-	else if (reply_.load()->type == REDIS_REPLY_ARRAY)
+		break;
+	case REDIS_REPLY_STRING:
 	{
-		redisReply* c = reply_.load();
-		for (int i = 0; i < reply_.load()->elements; i += 5)
+		reply_strs->push_back(reply->str);
+	}
+		break;
+	case REDIS_REPLY_INTEGER:
+	{
+		if (need_num > (size_t)reply->integer)
 		{
-			for (int j = 0; j < 5; ++j)
-			{
-				std::cout << reply_.load()->element[i+j]->str << "\t";
-			}
-			std::cout << std::endl;
+			execute_ret = false;
 		}
 	}
+		break;
+	case REDIS_REPLY_ARRAY:
+	{
+		for (int i = 0; i < reply->elements; ++i)
+		{
+			reply_strs->push_back(reply->element[i]->str);
+		}
+	}
+		break;
+	default:
+		break;
+		
+	}
 	
-	freeReplyObject(reply_);
+	freeReplyObject(reply);
 
 	return execute_ret;
 }
@@ -60,16 +86,16 @@ bool CRedisWrapper::execute_mul_operation(const char** commands, int counts)
 {
 	bool execute_ret = true;
 
-	reply_ = (redisReply *)redisCommand(connect_, "MULTI");
+	redisReply* reply = (redisReply *)redisCommand(connect_, "MULTI");
 
 	for (int i = 0; i < counts; ++i)
 	{
-		reply_ = (redisReply *)redisCommand(connect_, commands[i]);
+		reply = (redisReply *)redisCommand(connect_, commands[i]);
 	}
 
-	reply_ = (redisReply *)redisCommand(connect_, "EXEC");
+	reply = (redisReply *)redisCommand(connect_, "EXEC");
 
-	freeReplyObject(reply_);
+	freeReplyObject(reply);
 
 	return execute_ret;
 }

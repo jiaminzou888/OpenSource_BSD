@@ -14,6 +14,8 @@ int main(int argc, char* argv[])
 	mana.subscribe_market(vect);
 	mana.open_consumer_thread();
 
+	CMAStrategy mas(vect);
+	mana.attach_md_strategy(&mas);
 
 	while (true)
 	{

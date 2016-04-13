@@ -3,6 +3,7 @@
 #include "RedisWrapper.h"
 #include "MdBroadCast.h"
 #include "CppThread.hpp"
+#include "CandleBar.h"
 
 #include <vector>
 #include <string>
@@ -18,12 +19,14 @@ public:
 	bool open_consumer_thread();
 	void close_consumer_thread();
 
-	void subscribe_market(std::vector<std::string> ins);
+	bool subscribe_market(std::vector<std::string> ins);
+
+	void attach_md_strategy(CStrategy* stg);
 
 private:
 	CRedisWrapper	redis_;
 	CMdBroadCast	md_;
 	CppThread		thread_;
 	
-	std::vector<std::string> intrusts_;
+	std::vector<std::string>		intrusts_;
 };
