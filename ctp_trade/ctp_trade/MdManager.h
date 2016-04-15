@@ -11,6 +11,8 @@
 class CMdManager
 {
 public:
+	CMdManager();
+
 	static void controll_function(void* data);
 
 	bool initial_md_manager();
@@ -24,6 +26,8 @@ public:
 	void attach_md_strategy(CStrategy* stg);
 
 private:
+	std::string		root_log_;
+
 	CRedisWrapper	redis_;
 	CMdBroadCast	md_;
 	CppThread		thread_;

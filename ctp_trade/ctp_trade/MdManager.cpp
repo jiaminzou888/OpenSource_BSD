@@ -1,9 +1,18 @@
 #include "MdManager.h"
 #include "EfficientMap.h"
+#include "GLogWrapper.h"
 
 #include <algorithm>
 
-const size_t tick_min_num = 120; // 
+
+CMdManager::CMdManager()
+{
+	char module_dir[MAX_PATH + 1] = { 0 };
+	::GetModuleFileName(nullptr, module_dir, MAX_PATH);
+	root_log_ = module_dir;
+
+	root_log_ = root_log_.substr(0, root_log_.find_last_of("\\")) + "\\glog_log";
+}
 
 void CMdManager::controll_function(void* data)
 {
@@ -31,6 +40,7 @@ bool CMdManager::initial_md_manager()
 
 	bool md_ret = true;
 	
+	CGLog::get_glog()->init_log(root_log_.c_str());
 	md_ret &= redis_.connect_redis_instance();
 	md_ret &= md_.initial_md_broadcast();
 
@@ -41,6 +51,7 @@ void CMdManager::release_md_manager()
 {
 	md_.release_md_broadcast();
 	redis_.free_redis_instance();
+	CGLog::get_glog()->release_log();
 }
 
 bool CMdManager::open_consumer_thread()

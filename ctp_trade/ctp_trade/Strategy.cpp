@@ -1,5 +1,6 @@
 #include "Strategy.h"
 #include "EfficientMap.h"
+#include "GLogWrapper.h"
 
 #include <iostream>
 #include <algorithm>
@@ -33,7 +34,7 @@ void CStrategy::update(mtk_data* data)
 	tick_base_pushback(data->InstrumentID, *data);
 }
 
-void CStrategy::print_info()
+void CStrategy::print_info(const char* ins_str)
 {
 
 }
@@ -71,7 +72,7 @@ void CStrategy::calculate_process(std::string ins)
 		candle_bar min1_bar;
 		convert_tick2min(ins, min1_bar);
 		kdata_[ins][K_MIN].get_candle_container().push_back(min1_bar);
-		print_info();
+		print_info(ins.c_str());
 	}
 }
 
@@ -112,6 +113,24 @@ void CStrategy::convert_tick2min(std::string ins, candle_bar& min_bar)
 		}
 	});
 
+	//////////////////////////////////////////////////////////////////////////
+	// Read Demand Tick Data
+	CGLog::get_glog()->print_log("bar_type\t\t  InstrumentID\t\t  UpdateTime\t\t  TradingDay\t\t  LastPrice\t\t  Turnover\t\t  ");
+
+	char data_info[1024] = { 0 };
+	for (auto data : tick_vec)
+	{
+		sprintf_s(data_info, sizeof(data_info)-1, "%d\t\t  %s\t\t  %d\t\t  %d\t\t  %lf\t\t  %lf\t\t  ", K_MIN, data.InstrumentID, data.UpdateMillisec, atoi(data.TradingDay), data.LastPrice, data.Turnover);
+		CGLog::get_glog()->print_log(data_info);
+	}
+	CGLog::get_glog()->print_log("\r\n");
+
+	// Check Out The Synthetic
+	sprintf_s(data_info, sizeof(data_info)-1, "%lf\t\t  %lf\t\t  %lf\t\t  %lf\t\t  %lf\t\t  %lf\t\t  %lf\t\t  ", min_bar.open_price, min_bar.close_price, min_bar.high_price, min_bar.low_price, min_bar.change_point, min_bar.change_percent, min_bar.turn_over);
+	CGLog::get_glog()->print_log(data_info);
+	CGLog::get_glog()->print_log("\r\n");
+	//////////////////////////////////////////////////////////////////////////
+
 	// Erase Used Data
 	tick_vec.erase(tick_vec.begin(), tick_vec.begin() + minute_tick_num);
 }
@@ -122,7 +141,7 @@ CMAStrategy::CMAStrategy(instr_container instr)
 
 }
 
-void CMAStrategy::print_info()
+void CMAStrategy::print_info(const char* ins_str)
 {
-	std::cout << "Moving Average Strategy~" << std::endl;
+	std::cout << "Moving Average Strategy:  " << ins_str << std::endl;
 }

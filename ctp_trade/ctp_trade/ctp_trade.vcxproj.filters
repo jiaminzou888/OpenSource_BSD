@@ -45,6 +45,9 @@
     <ClInclude Include="Strategy.h">
       <Filter>头文件\Strategy</Filter>
     </ClInclude>
+    <ClInclude Include="GLogWrapper.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ctp_trade.cpp">
@@ -64,6 +67,9 @@
     </ClCompile>
     <ClCompile Include="Strategy.cpp">
       <Filter>源文件\Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="GLogWrapper.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

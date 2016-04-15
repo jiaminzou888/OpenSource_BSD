@@ -28,7 +28,7 @@ public:
 	const instr_container& get_focused_instr() const;
 
 	virtual ~CStrategy() = default;
-	virtual void print_info();
+	virtual void print_info(const char* ins_str);
 
 protected:
 	instr_container	focused_inst_;
@@ -47,6 +47,6 @@ class CMAStrategy : public CStrategy
 public:
 	CMAStrategy(instr_container instr);
 
-	void print_info() override;
+	void print_info(const char* ins_str) override;
 	
 };

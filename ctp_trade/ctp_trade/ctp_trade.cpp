@@ -4,6 +4,7 @@
 
 int main(int argc, char* argv[])
 {
+	
 	CMdManager mana;
 	mana.initial_md_manager();
 
@@ -24,6 +25,7 @@ int main(int argc, char* argv[])
 
 	mana.close_consumer_thread();
 	mana.release_md_manager();
+
 
 	return 0;
 }
