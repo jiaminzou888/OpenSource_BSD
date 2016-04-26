@@ -105,7 +105,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;USE_STATIC;USE_JEMALLOC;_OFF_T_DEFINED;USE_DL_PREFIX;LACKS_STDLIB_H;NO_QFORKIMPL;WIN32_IOCP;_CRT_SECURE_NO_WARNINGS;PSAPI_VERSION=1</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_LIB;USE_STATIC;USE_JEMALLOC;_OFF_T_DEFINED;USE_DL_PREFIX;LACKS_STDLIB_H;NO_QFORKIMPL;WIN32_IOCP;_CRT_SECURE_NO_WARNINGS;PSAPI_VERSION=1</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <StructMemberAlignment>Default</StructMemberAlignment>
       <AdditionalIncludeDirectories>.\..\tradeapi;.\..\cpp_tools;.\..\redis\src;.\..\redis\deps\hiredis;.\..\glog\src</AdditionalIncludeDirectories>

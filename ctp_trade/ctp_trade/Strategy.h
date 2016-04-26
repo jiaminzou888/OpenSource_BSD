@@ -38,7 +38,7 @@ protected:
 
 private:
 	void calculate_process(std::string ins);
-	void convert_tick2min(std::string ins, candle_bar& min_bar);
+	void convert_tick2min(std::vector<mtk_data>& tick_vec, candle_bar& min_bar);
 };
 
 // Moving Average Strategy
