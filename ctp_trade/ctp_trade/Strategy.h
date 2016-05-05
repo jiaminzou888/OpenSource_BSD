@@ -1,52 +1,38 @@
 #pragma once
 
-#include "SolveReDefinition.h"
-// Has To Be Behind 'SolveReDefinition.h'
-#include <vector>
-#include <string>
-#include <map>
-#include <mutex>
-#include <memory>
-
-#include "ThostFtdcUserApiStruct.h"
 #include "CandleBar.h"
 
-using instr_container = std::vector<std::string>;
+#include <string>
+#include <map>
 
-class CMdBroadCast;	// Prerequisite Declaration
+
+
+// Every Strategy Has Its Own Copy Of Focused Instruments Min KData As The Base Data, 
+// Which Is Used To Calculate Indicators That Is For Trading In Real-time.  
 
 class CStrategy
 {
 public:
-	CStrategy() = default;
-	CStrategy(instr_container instr);
-
-	void	update(mtk_data* data);
-	size_t	tick_base_getsize(std::string ins);
-	void	tick_base_pushback(std::string ins, mtk_data& data);
-	void	calculate_min_bar(std::string ins);
-	const instr_container& get_focused_instr() const;
-
+	CStrategy();
 	virtual ~CStrategy() = default;
-	virtual void print_info(const char* ins_str);
+	
+	bool init_stg(std::string config_path, std::string config_head);
+	void update(candle_bar& min_data);
 
 protected:
-	instr_container	focused_inst_;
-	std::map<std::string, std::shared_ptr<std::mutex>>		tick_mutex_;
-	std::map<std::string, std::vector<mtk_data>>			tick_base_;	// Tick Data For kdata_ Calculation 
-	std::map<std::string, std::map<k_types, CCandleBar>>	kdata_;
+	std::string config_head_;
+	std::vector<std::string>	focused_inst_;		// Target Instruments
+	std::map<std::string, CCandleBar>	min_data_;	// One Minute K Data
 
 private:
-	void calculate_process(std::string ins);
-	void convert_tick2min(std::vector<mtk_data>& tick_vec, candle_bar& min_bar);
+	bool load_focused_inst(std::string& config_path, std::string& config_head);
 };
 
 // Moving Average Strategy
 class CMAStrategy : public CStrategy	
 {
 public:
-	CMAStrategy(instr_container instr);
-
-	void print_info(const char* ins_str) override;
+	
+private:
 	
 };

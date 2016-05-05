@@ -2,15 +2,23 @@
 
 CCandleBar::CCandleBar()
 {
-	candle_container.reserve(512);
+	candles_.reserve(256);
+}
+
+void CCandleBar::push_bar(candle_bar& bar)
+{
+	candles_.emplace_back(bar);
 }
 
 int	CCandleBar::convert_kdata(CCandleBar& k_src, CCandleBar& k_des, size_t mul_num)
 {
-	return 0;
-}
+	// Convert k_src Bars To k_des Bar According To Their Multiple
+	if (mul_num < 2)
+	{
+		return 0;
+	}
+	
 
-std::vector<candle_bar>& CCandleBar::get_candle_container()
-{
-	return candle_container;
+
+	return 0;
 }

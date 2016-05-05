@@ -165,6 +165,7 @@
     <ClInclude Include="GLogWrapper.h" />
     <ClInclude Include="MdBroadCast.h" />
     <ClInclude Include="MdManager.h" />
+    <ClInclude Include="PublicDataStruct.h" />
     <ClInclude Include="RedisWrapper.h" />
     <ClInclude Include="SolveReDefinition.h" />
     <ClInclude Include="Strategy.h" />

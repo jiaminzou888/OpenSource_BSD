@@ -3,9 +3,7 @@
 #include "RedisWrapper.h"
 #include "MdBroadCast.h"
 #include "CppThread.hpp"
-#include "CandleBar.h"
 
-#include <vector>
 #include <string>
 
 class CMdManager
@@ -13,24 +11,18 @@ class CMdManager
 public:
 	CMdManager();
 
-	static void controll_function(void* data);
-
-	bool initial_md_manager();
+	bool initial_md_manager(std::vector<std::string>& ins);
 	void release_md_manager();
 
-	bool open_consumer_thread();
-	void close_consumer_thread();
-
-	bool subscribe_market(std::vector<std::string> ins);
+	bool get_md_conncet_status();
+	bool subscribe_market();
 
 	void attach_md_strategy(CStrategy* stg);
 
 private:
-	std::string		root_log_;
+	std::string					root_log_;
 
 	CRedisWrapper	redis_;
 	CMdBroadCast	md_;
-	CppThread		thread_;
 	
-	std::vector<std::string>		intrusts_;
 };

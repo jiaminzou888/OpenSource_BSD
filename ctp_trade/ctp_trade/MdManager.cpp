@@ -14,35 +14,14 @@ CMdManager::CMdManager()
 	root_log_ = root_log_.substr(0, root_log_.find_last_of("\\")) + "\\glog_log";
 }
 
-void CMdManager::controll_function(void* data)
-{
-	CppThread*	handle_th = static_cast<CppThread*>(data);
-	CMdManager* handle_ma = static_cast<CMdManager*>(handle_th->get_data());
-
-	while (!handle_th->is_stop())
-	{
-		const strategy_list& stg_list = handle_ma->md_.get_strategy_list();
-		for (auto stg : stg_list)
-		{
-			const instr_container& ins_vec = stg->get_focused_instr();
-			for (auto ins : ins_vec)
-			{
-				stg->calculate_min_bar(ins);
-			}
-		}
-	}
-}
-
-bool CMdManager::initial_md_manager()
+bool CMdManager::initial_md_manager(std::vector<std::string>& ins)
 {
 	// initial capacity of vector
-	intrusts_.reserve(64);
-
 	bool md_ret = true;
 	
 	CGLog::get_glog()->init_log(root_log_.c_str());
 	md_ret &= redis_.connect_redis_instance();
-	md_ret &= md_.initial_md_broadcast();
+	md_ret &= md_.initial_md_broadcast(ins);
 
 	return md_ret;
 }
@@ -54,37 +33,25 @@ void CMdManager::release_md_manager()
 	CGLog::get_glog()->release_log();
 }
 
-bool CMdManager::open_consumer_thread()
+bool CMdManager::get_md_conncet_status()
 {
-	// Start One Consumer Thread
-	thread_.set_data(this);
-	return thread_.create_thread(controll_function);
+	return md_.get_connect_flag();
 }
 
-void CMdManager::close_consumer_thread()
-{
-	thread_.set_stop(true);
-	thread_.close_thread();
-}
-
-bool CMdManager::subscribe_market(std::vector<std::string> ins)
+bool CMdManager::subscribe_market()
 {
 	bool sub_ret = false;
 
-	size_t ins_size = ins.size();
+	size_t ins_size = md_.get_instruments_size();
 
 	if (0 == ins_size)
 	{
 		return sub_ret;
 	}
 
-	intrusts_			= ins;
+	// Subscribe MD Data
 	char** instr	= new char*[ins_size];
-	
-	for (size_t i = 0; i < ins_size; ++i)
-	{
-		instr[i] = const_cast<char*>(intrusts_[i].c_str());
-	}
+	md_.get_instrument_name(instr, ins_size);
 
 	// Waiting For Login Successfully At First Forever, I'll Optimize It Sooner Or Later.
 	while (true)
