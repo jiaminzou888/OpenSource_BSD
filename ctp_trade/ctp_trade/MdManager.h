@@ -4,8 +4,6 @@
 #include "MdBroadCast.h"
 #include "CppThread.hpp"
 
-#include <string>
-
 class CMdManager
 {
 public:
@@ -20,7 +18,7 @@ public:
 	void attach_md_strategy(CStrategy* stg);
 
 private:
-	std::string					root_log_;
+	std::string		root_log_;
 
 	CRedisWrapper	redis_;
 	CMdBroadCast	md_;

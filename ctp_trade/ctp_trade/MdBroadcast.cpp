@@ -26,7 +26,7 @@ void CMdBroadCast::calculate_min_function(void* data)
 
 	while (!handle_th->is_stop())
 	{
-		for_each(handle_md->subscribe_inst_.begin(), handle_md->subscribe_inst_.end(), [&handle_md](std::string& ins)
+		std::for_each(handle_md->subscribe_inst_.begin(), handle_md->subscribe_inst_.end(), [&handle_md](std::string& ins)
 		{
 			handle_md->calculate_min_bar(ins);
 		});
@@ -35,7 +35,7 @@ void CMdBroadCast::calculate_min_function(void* data)
 
 void CMdBroadCast::notify_min_data(candle_bar& data)
 {
-	for_each(stg_list_.begin(), stg_list_.end(), [&data](std::shared_ptr<CStrategy>& stg)
+	std::for_each(stg_list_.begin(), stg_list_.end(), [&data](std::shared_ptr<CStrategy>& stg)
 	{
 		stg->update(data);
 	});
@@ -82,6 +82,7 @@ void CMdBroadCast::set_intruments(std::vector<std::string>& ins)
 
 	// Initialize Vector
 	sub_ticks_.reserve(256);
+	sub_mutex_ = std::move(std::shared_ptr<std::mutex>(new std::mutex));
 }
 
 size_t	CMdBroadCast::get_instruments_size()
@@ -99,11 +100,11 @@ void CMdBroadCast::get_instrument_name(char**& inst_ptr, size_t ins_size)
 
 void CMdBroadCast::distribute_mtk_tick()
 {
-	std::lock_guard<std::mutex> lck(sub_ticks_mutex_);
+	std::lock_guard<std::mutex> lck(*sub_mutex_);
 
 	if (!sub_ticks_.empty())
 	{
-		for_each(sub_ticks_.begin(), sub_ticks_.end(), [this](mtk_data& dt)
+		std::for_each(sub_ticks_.begin(), sub_ticks_.end(), [this](mtk_data& dt)
 		{
 			tick_base_pushback(dt.InstrumentID, dt);
 		});
@@ -257,7 +258,6 @@ void CMdBroadCast::convert_tick2min(std::vector<mtk_data>& tick_vec, candle_bar&
 	mtk_data& last_data = tick_vec.back();
 
 	// Initial Basic Information
-	min_bar.bar_type = K_MIN;
 	strncpy_s(min_bar.bar_name, first_data.InstrumentID, sizeof(mtk_data_name));
 	strncpy_s(min_bar.bar_ecg, first_data.ExchangeID, sizeof(mtk_data_exchange));
 
@@ -288,18 +288,18 @@ void CMdBroadCast::convert_tick2min(std::vector<mtk_data>& tick_vec, candle_bar&
 
 	//////////////////////////////////////////////////////////////////////////
 	// Read Demand Tick Data
-	CGLog::get_glog()->print_log("bar_type\t\t  InstrumentID\t\t  UpdateTime\t\t  TradingDay\t\t  LastPrice\t\t  Volume\t\t  ");
+	CGLog::get_glog()->print_log("InstrumentID\t\t  UpdateTime\t\t  TradingDay\t\t  LastPrice\t\t  Volume\t\t  ");
 
 	char data_info[1024] = { 0 };
 	for (auto data = tick_vec.begin(); data != tick_vec.end(); ++data)
 	{
-		sprintf_s(data_info, sizeof(data_info)-1, "%d\t\t  %s\t\t  %s\t\t  %s\t\t  %lf\t\t  %lf\t\t  ", K_MIN, data->InstrumentID, data->UpdateTime, data->TradingDay, data->LastPrice, data->Volume);
+		sprintf_s(data_info, sizeof(data_info)-1, "%s\t\t  %s\t\t  %s\t\t  %lf\t\t  %d\t\t  ", data->InstrumentID, data->UpdateTime, data->TradingDay, data->LastPrice, data->Volume);
 		CGLog::get_glog()->print_log(data_info);
 	}
 	CGLog::get_glog()->print_log("\r\n");
 
 	// Check Out The Synthetic
-	sprintf_s(data_info, sizeof(data_info)-1, "%lf\t\t  %lf\t\t  %lf\t\t  %lf\t\t  %lf\t\t  %lf\t\t  %lf\t\t  ", min_bar.open_price, min_bar.close_price, min_bar.high_price, min_bar.low_price, min_bar.change_point, min_bar.change_percent, min_bar.volume_size);
+	sprintf_s(data_info, sizeof(data_info)-1, "%lf\t\t  %lf\t\t  %lf\t\t  %lf\t\t  %lf\t\t  %lf\t\t  %d\t\t  ", min_bar.open_price, min_bar.close_price, min_bar.high_price, min_bar.low_price, min_bar.change_point, min_bar.change_percent, min_bar.volume_size);
 	CGLog::get_glog()->print_log(data_info);
 	CGLog::get_glog()->print_log("\r\n");
 	//////////////////////////////////////////////////////////////////////////
@@ -415,6 +415,6 @@ void CMdBroadCast::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CT
 void CMdBroadCast::OnRtnDepthMarketData(mtk_data *pDepthMarketData)
 {
 	// Refuse To Block Interface CallBack
-	std::lock_guard<std::mutex> lck(sub_ticks_mutex_);
+	std::lock_guard<std::mutex> lck(*sub_mutex_);
 	sub_ticks_.emplace_back(*pDepthMarketData);
 }

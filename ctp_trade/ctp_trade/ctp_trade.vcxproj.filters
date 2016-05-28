@@ -51,6 +51,9 @@
     <ClInclude Include="PublicDataStruct.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="TechniqueIndicator.h">
+      <Filter>头文件\Strategy</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ctp_trade.cpp">
@@ -73,6 +76,9 @@
     </ClCompile>
     <ClCompile Include="GLogWrapper.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TechniqueIndicator.cpp">
+      <Filter>源文件\Strategy</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

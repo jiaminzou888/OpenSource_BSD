@@ -1,16 +1,10 @@
 #pragma once
 
-#include "SolveReDefinition.h"
-// Has To Be Behind 'SolveReDefinition.h'
+#include "Strategy.h"
 #include <list>
-#include <memory>
-#include <mutex>
 
 #include "ThostFtdcMdApi.h"
-#include "Strategy.h"
 #include "CppThread.hpp"
-
-using strategy_list = std::list<std::shared_ptr<CStrategy>>;
 
 class CMdBroadCast : private CThostFtdcMdSpi
 {
@@ -43,18 +37,19 @@ private:
 
 private:
 	bool			connect_flag_{ false };
-	strategy_list	stg_list_;		// Registered Strategies
-
+	
 	std::vector<std::string>		subscribe_inst_;	// Subscribed Instruments
 	std::map<std::string, bool>		mtk_open_;			// Market Open Flag
 
 	CppThread		distribute_thread_;	// Tick Data Distribution
-	std::mutex						sub_ticks_mutex_;	// sub_ticks_ Lock
+	std::shared_ptr<std::mutex>		sub_mutex_;			// sub_ticks_ Lock
 	std::vector<mtk_data>			sub_ticks_;			// Subscribed MD Data
 
-	CppThread		calculate_thread_;	// Tick Data Calculation Consumer
+	CppThread		calculate_thread_;					// Tick Data Calculation Consumer
 	std::map<std::string, std::shared_ptr<std::mutex>>		tick_mutex_;	// tick_base_ Lock
 	std::map<std::string, std::vector<mtk_data>>			tick_base_;		// Ticks For Base Data Calculation 
+
+	std::list<std::shared_ptr<CStrategy>>	stg_list_;	// Registered Strategies
 	
 // MD Interface Business
 public:

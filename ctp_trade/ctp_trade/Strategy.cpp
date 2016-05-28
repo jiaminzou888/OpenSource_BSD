@@ -1,24 +1,12 @@
 #include "Strategy.h"
 
+#include <string>
 #include <fstream>
 #include <algorithm>
 
 #include "EfficientMap.h"
 
-
-
-CStrategy::CStrategy()
-{
-	// Initialize Member Oject
-	for (auto ins : focused_inst_)
-	{
-		// Initial One Minute Data Map
-		CCandleBar min_bar;
-		efficient_map_operation(min_data_, ins, min_bar);
-	}
-}
-
-bool CStrategy::init_stg(std::string config_path, std::string config_head)
+bool CStrategy::init(std::string config_path, std::string config_head)
 {
 	bool init_ret = true;
 
@@ -34,9 +22,9 @@ bool CStrategy::init_stg(std::string config_path, std::string config_head)
 void CStrategy::update(candle_bar& data)
 {
 	std::string ins = data.bar_name;
-	if (min_data_.find(ins) != min_data_.end())
+	if (min_base_.find(ins) != min_base_.end())
 	{
-		min_data_[ins].push_bar(data);
+		min_base_[ins].push_bar(data);
 	}
 }
 
@@ -58,6 +46,9 @@ bool CStrategy::load_focused_inst(std::string& config_path, std::string& config_
 		{
 			if (std::string::npos != string_line.find_first_of("="))
 			{
+				// Initial One Minute Data Map
+				CCandleBar min_bar;
+
 				// Trim Space
 				string_line.erase(std::remove_if(string_line.begin(), string_line.end(), [](char c){return c == ' '; }), string_line.end());
 
@@ -68,14 +59,14 @@ bool CStrategy::load_focused_inst(std::string& config_path, std::string& config_
 				ins_pos = string_line.find_first_of("|", beg_pos);
 				while (std::string::npos != ins_pos)
 				{
-					focused_inst_.emplace_back(string_line.substr(beg_pos, ins_pos - beg_pos));
-
+					efficient_map_operation(min_base_, string_line.substr(beg_pos, ins_pos - beg_pos), min_bar);
+					
 					beg_pos = ins_pos + 1;
 					ins_pos = string_line.find_first_of("|", beg_pos);
 				}
 				if (ins_pos > beg_pos)
 				{
-					focused_inst_.emplace_back(string_line.substr(beg_pos, ins_pos - beg_pos));
+					efficient_map_operation(min_base_, string_line.substr(beg_pos, ins_pos - beg_pos), min_bar);
 				}
 
 				cfg_ret = true;
@@ -95,4 +86,14 @@ bool CStrategy::load_focused_inst(std::string& config_path, std::string& config_
 	return cfg_ret;
 }
 
+//////////////////////////////////////////////////////////////////////////
+bool CMAStrategy::init_ma_stg()
+{
+	for_each(min_base_.begin(), min_base_.end(), [this](std::map<std::string, CCandleBar>::reference& node)
+	{
+		CMovingAverage ma(node.second);
+		efficient_map_operation(data_ma_, node.first, ma);
+	});
 
+	return true;
+}

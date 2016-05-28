@@ -7,7 +7,7 @@ int main(int argc, char* argv[])
 {
 	// Load Interested Instruments
 	std::vector<std::string> vect;
-	vect.push_back("IF1605");
+	vect.push_back("IF1607");
 	vect.push_back("j1701");
 	vect.push_back("rb1610");
 	vect.push_back("CF609");
@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
 
 	CMAStrategy mas;
 
-	mas.init_stg("E:/OpenSource_BSD/ctp_trade/x64/Debug/inst_config.ini", "MA_STG");
+	mas.init("E:/OpenSource_BSD/ctp_trade/x64/Debug/inst_config.ini", "MA_STG");
 
 	mana.attach_md_strategy(&mas);
 

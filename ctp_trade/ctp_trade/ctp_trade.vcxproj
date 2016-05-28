@@ -169,6 +169,7 @@
     <ClInclude Include="RedisWrapper.h" />
     <ClInclude Include="SolveReDefinition.h" />
     <ClInclude Include="Strategy.h" />
+    <ClInclude Include="TechniqueIndicator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CandleBar.cpp" />
@@ -178,6 +179,7 @@
     <ClCompile Include="MdManager.cpp" />
     <ClCompile Include="RedisWrapper.cpp" />
     <ClCompile Include="Strategy.cpp" />
+    <ClCompile Include="TechniqueIndicator.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

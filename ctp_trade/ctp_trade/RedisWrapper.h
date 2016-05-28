@@ -4,7 +4,6 @@
 // Has To Be Behind 'SolveReDefinition.h'
 #include <atomic>
 #include <vector>
-#include <string>
 
 #include "hiredis.h" 
 #include "Win32_Interop\win32fixes.h"
@@ -19,5 +18,5 @@ public:
 	bool execute_mul_operation(const char** commands, int counts);
 
 private:
-	redisContext*				connect_{ nullptr };
+	redisContext*	connect_{ nullptr };
 };
