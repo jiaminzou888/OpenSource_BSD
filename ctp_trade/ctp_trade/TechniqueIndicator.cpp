@@ -19,7 +19,7 @@ bool CTechniqueIndicator::valid_tech_signal(int signal)
 
 bool CTechniqueIndicator::asset_calculate_parameters(int date_index, int periods)
 {
-	if (!base_kdata.get() || date_index < 0 || date_index >= base_kdata->candle_size() || periods <= 0)
+	if (!base_kdata.get() || date_index < 0 || date_index >= base_kdata->get_candle_size() || periods <= 0)
 	{
 		return false;
 	}

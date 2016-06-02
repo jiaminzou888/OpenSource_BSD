@@ -167,9 +167,13 @@
     <ClInclude Include="MdManager.h" />
     <ClInclude Include="PublicDataStruct.h" />
     <ClInclude Include="RedisWrapper.h" />
+    <ClInclude Include="SavaData.h" />
     <ClInclude Include="SolveReDefinition.h" />
     <ClInclude Include="Strategy.h" />
+    <ClInclude Include="TdManager.h" />
+    <ClInclude Include="TdTradeSpi.h" />
     <ClInclude Include="TechniqueIndicator.h" />
+    <ClInclude Include="TradeManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CandleBar.cpp" />
@@ -178,8 +182,12 @@
     <ClCompile Include="MdBroadcast.cpp" />
     <ClCompile Include="MdManager.cpp" />
     <ClCompile Include="RedisWrapper.cpp" />
+    <ClCompile Include="SaveData.cpp" />
     <ClCompile Include="Strategy.cpp" />
+    <ClCompile Include="TdManager.cpp" />
+    <ClCompile Include="TdTradeSpi.cpp" />
     <ClCompile Include="TechniqueIndicator.cpp" />
+    <ClCompile Include="TradeManager.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

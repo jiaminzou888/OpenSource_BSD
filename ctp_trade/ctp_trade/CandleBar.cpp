@@ -4,8 +4,26 @@
 
 CCandleBar::CCandleBar()
 {
+	candle_type = MIN_ONE;
+
 	candles_.reserve(256);
 	mutex_ = std::move(std::shared_ptr<std::mutex>(new std::mutex));
+}
+
+void CCandleBar::set_candle_type(int type)
+{
+	candle_type = type;
+}
+
+int	CCandleBar::get_candle_type()
+{
+	return candle_type;
+}
+
+size_t	CCandleBar::get_candle_size()
+{
+	std::lock_guard<std::mutex> lck(*mutex_);
+	return candles_.size();
 }
 
 void CCandleBar::push_bar(candle_bar& bar)
@@ -14,10 +32,23 @@ void CCandleBar::push_bar(candle_bar& bar)
 	candles_.emplace_back(bar);
 }
 
-size_t	CCandleBar::candle_size()
+void CCandleBar::get_bars(std::vector<candle_bar>& target)
 {
 	std::lock_guard<std::mutex> lck(*mutex_);
-	return candles_.size();
+
+	if (!candles_.empty())
+	{
+		target.insert(target.end(), candles_.begin(), candles_.end());
+		candles_.clear();
+	}
+}
+
+CCandleBar& CCandleBar::operator + (const std::vector<candle_bar>& target)
+{
+	std::lock_guard<std::mutex> lck(*mutex_);
+	this->insert_candles_backward(target);
+
+	return *this;
 }
 
 void CCandleBar::convert_kdata(CCandleBar& des_candles, size_t multiple)
@@ -97,6 +128,11 @@ bool CCandleBar::get_ma(int date_index, int periods, int type, double& data)
 	}
 
 	return false;
+}
+
+void CCandleBar::insert_candles_backward(const std::vector<candle_bar>& target)
+{
+	candles_.insert(candles_.end(), target.begin(), target.end());
 }
 
 double CCandleBar::get_price(int date_index, int type)

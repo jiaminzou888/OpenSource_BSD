@@ -221,7 +221,8 @@ extern int FDAPI_fileno(FILE *file);
 
 // Macroize CRT definitions to point to our own
 #ifndef FDAPI_NOCRTREDEFS
-#define close(fd)                   FDAPI_close(fd)
+// comment by zjm
+//#define close(fd)                   FDAPI_close(fd)
 #define fclose(File)                FDAPI_fclose(File)
 #define setmode(fd,mode)            FDAPI_setmode(fd,mode)
 #define fwrite(Str,Size,Count,File) FDAPI_fwrite(Str,Size,Count,File)

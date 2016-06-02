@@ -3,10 +3,16 @@
 #include "SolveReDefinition.h"
 // Has To Be Behind 'SolveReDefinition.h'
 #include <cassert>
+#include <ctime>
+#include <fstream>
+
 #include <map>
-#include <mutex>
+#include <list>
 #include <vector>
 #include <memory>
+
+#include <mutex>
+#include <condition_variable>
 
 #include "ThostFtdcUserApiStruct.h"
 
@@ -41,6 +47,7 @@ struct candle_bar
 	mtk_data_exchange	bar_ecg;
 
 	size_t trade_day;
+	size_t trade_time;
 
 	double open_price;
 	double high_price;
@@ -55,6 +62,46 @@ struct candle_bar
 	candle_bar()
 	{
 		memset(this, 0x00, sizeof(candle_bar));
+	}
+};
+
+struct td_attribute
+{
+	CThostFtdcRspInfoField response_msg;
+
+	int front_id;
+	int session_id;
+	int order_ref;
+	char exchange_time[5][9];
+
+	size_t trade_day;
+	
+	td_attribute()
+	{
+		memset(this, 0x00, sizeof(td_attribute));
+	}
+};
+
+struct trade_handle
+{
+	std::mutex mtx;
+	std::condition_variable cv;
+	bool ready_flag{ false };
+
+	void wait_handle()
+	{
+		std::unique_lock <std::mutex> lck(mtx);
+		while (!ready_flag)
+		{
+			cv.wait(lck);
+		}
+	}
+
+	void notify_handle()
+	{
+		std::unique_lock <std::mutex> lck(mtx);
+		ready_flag = true;
+		cv.notify_all();
 	}
 };
 

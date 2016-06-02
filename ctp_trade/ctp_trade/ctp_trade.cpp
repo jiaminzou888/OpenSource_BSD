@@ -1,34 +1,32 @@
 // ctp_trade.cpp : 定义控制台应用程序的入口点。
 
-#include "MdManager.h"
-#include <time.h>
+#include "TradeManager.h"
 
 int main(int argc, char* argv[])
 {
-	// Load Interested Instruments
-	std::vector<std::string> vect;
-	vect.push_back("IF1607");
-	vect.push_back("j1701");
-	vect.push_back("rb1610");
-	vect.push_back("CF609");
+	// Create Different Strategies
+	int	ma_data_type = CCandleBar::MIN_FIVE | CCandleBar::MIN_ONE | CCandleBar::MIN_FIVETEEN;
 
-	CMdManager mana;
+	CMAStrategy ma_stg;
+	ma_stg.initial_ma_stg("E:\\OpenSource_BSD\\ctp_trade\\x64\\Debug\\inst_config.ini", "MA_STG", ma_data_type);
 
-	mana.initial_md_manager(vect);
-	mana.subscribe_market();
+	// Trader Manager
+	CTradeManager trader;;
+	trader.attach_trade_strategy(&ma_stg);
 
-	CMAStrategy mas;
+	// Try To Set Strategies List in initial
+	trader.initial_trader();
 
-	mas.init("E:/OpenSource_BSD/ctp_trade/x64/Debug/inst_config.ini", "MA_STG");
-
-	mana.attach_md_strategy(&mas);
-
-	while (mana.get_md_conncet_status())
+	while (true)
 	{
 		int i = 0;
 	}
 
-	mana.release_md_manager();
+	ma_stg.release_ma_stg();
+
+	trader.dettach_trade_strategy(&ma_stg);
+
+	trader.release_trader();
 
 	return 0;
 }

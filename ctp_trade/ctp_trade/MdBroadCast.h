@@ -1,20 +1,21 @@
 #pragma once
 
-#include "Strategy.h"
-#include <list>
-
 #include "ThostFtdcMdApi.h"
+
+#include "PublicDataStruct.h"
 #include "CppThread.hpp"
 
+
+class CMdManager;  // Forward Declaration For Management Pointer
+
+// Only Be Responsible For One Minute KData Calculation.
 class CMdBroadCast : private CThostFtdcMdSpi
 {
 // Observer Pattern Demand
 public:
-	void notify_min_data(candle_bar& data);
-	void attach_observer(CStrategy* stg);
-	void dettach_observer(CStrategy* stg);
+	CMdBroadCast(CMdManager* manage_ptr);
 
-	bool	get_connect_flag();
+	bool	get_md_connect_flag();
 	void	set_intruments(std::vector<std::string>& ins);
 	size_t	get_instruments_size();
 	void	get_instrument_name(char**& inst_ptr, size_t ins_size);
@@ -25,32 +26,37 @@ public:
 	static void calculate_min_function(void* data);
 	void calculate_min_bar(std::string ins);
 
+	void	get_min_kdata(std::string ins, std::vector<candle_bar>& bars);
+
 private:
 	void tick_base_pushback(std::string ins, mtk_data& data);
 	void calculate_process(std::string ins, bool is_open);
 
 	size_t  convert_time_str2int(char* update_time);
 	bool	check_mtk_time(char* update_time);
-	bool	is_minute_tail(char* prev_time, char* next_time);
+	bool	is_minute_tail(char* prev_time, char* next_time, size_t& td_time);
 	void	convert_tick2min(std::vector<mtk_data>& tick_vec, candle_bar& min_bar);
+
+	size_t  get_min_size(std::string ins);
+	void	push_min_kdata(std::string ins, candle_bar& data);
 	void	print_info(const char* ins_str);
 
 private:
-	bool			connect_flag_{ false };
+	bool			connect_md_flag_{ false };
 	
 	std::vector<std::string>		subscribe_inst_;	// Subscribed Instruments
 	std::map<std::string, bool>		mtk_open_;			// Market Open Flag
 
-	CppThread		distribute_thread_;	// Tick Data Distribution
+	CppThread		distribute_thread_;					// Tick Data Distribution
 	std::shared_ptr<std::mutex>		sub_mutex_;			// sub_ticks_ Lock
 	std::vector<mtk_data>			sub_ticks_;			// Subscribed MD Data
 
 	CppThread		calculate_thread_;					// Tick Data Calculation Consumer
-	std::map<std::string, std::shared_ptr<std::mutex>>		tick_mutex_;	// tick_base_ Lock
-	std::map<std::string, std::vector<mtk_data>>			tick_base_;		// Ticks For Base Data Calculation 
+	std::map<std::string, std::shared_ptr<std::mutex>>		tick_mutex_;		// tick_base_ Lock
+	std::map<std::string, std::vector<mtk_data>>			tick_base_;			// Ticks For Base Data Calculation 
 
-	std::list<std::shared_ptr<CStrategy>>	stg_list_;	// Registered Strategies
-	
+	std::shared_ptr<CMdManager>		manager_pointer;	// Store Minute Data Management
+
 // MD Interface Business
 public:
 	bool initial_md_broadcast(std::vector<std::string>& ins);

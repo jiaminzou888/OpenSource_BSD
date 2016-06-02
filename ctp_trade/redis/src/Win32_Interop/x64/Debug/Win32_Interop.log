@@ -1,0 +1,20 @@
+﻿生成启动时间为 2016/4/6 13:41:53。
+     1>项目“C:\Users\Administrator\Documents\Visual Studio 2013\Projects\redis-win\src\Win32_Interop\Win32_Interop.vcxproj”在节点 2 上(Build 个目标)。
+     1>CustomBuild:
+         Performing Custom Build Tools
+         子目录或文件 resources 已经存在。
+         MC: Compiling EventLog.mc
+         Microsoft (R) Windows (R) Resource Compiler Version 6.3.9600.16384
+         
+         Copyright (C) Microsoft Corporation.  All rights reserved.
+         
+         
+         Microsoft (R) Incremental Linker Version 12.00.21005.1
+         Copyright (C) Microsoft Corporation.  All rights reserved.
+         
+     1>LINK : fatal error LNK1181: 无法打开输入文件“Studio.obj”
+     1>已完成生成项目“C:\Users\Administrator\Documents\Visual Studio 2013\Projects\redis-win\src\Win32_Interop\Win32_Interop.vcxproj”(Build 个目标)的操作 - 失败。
+
+生成失败。
+
+已用时间 00:00:00.08

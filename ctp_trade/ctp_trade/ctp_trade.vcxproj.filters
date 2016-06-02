@@ -19,17 +19,23 @@
     <Filter Include="源文件\Strategy">
       <UniqueIdentifier>{640822eb-ba5a-41eb-819e-c1d3ef6f45a5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\Md">
+      <UniqueIdentifier>{483d5263-c510-4bad-a9a2-da69ad86d931}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Md">
+      <UniqueIdentifier>{891da80d-396c-4e9f-898b-94bad1ee89b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Td">
+      <UniqueIdentifier>{c7180584-aeca-4733-8dc9-42e7cd76077a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Td">
+      <UniqueIdentifier>{1d652608-2482-4d90-9172-a899861a8b18}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MdBroadCast.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="MdManager.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="SolveReDefinition.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -54,15 +60,27 @@
     <ClInclude Include="TechniqueIndicator.h">
       <Filter>头文件\Strategy</Filter>
     </ClInclude>
+    <ClInclude Include="SavaData.h">
+      <Filter>头文件\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="MdBroadCast.h">
+      <Filter>头文件\Md</Filter>
+    </ClInclude>
+    <ClInclude Include="MdManager.h">
+      <Filter>头文件\Md</Filter>
+    </ClInclude>
+    <ClInclude Include="TdManager.h">
+      <Filter>头文件\Td</Filter>
+    </ClInclude>
+    <ClInclude Include="TdTradeSpi.h">
+      <Filter>头文件\Td</Filter>
+    </ClInclude>
+    <ClInclude Include="TradeManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ctp_trade.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="MdBroadcast.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="MdManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="RedisWrapper.cpp">
@@ -79,6 +97,24 @@
     </ClCompile>
     <ClCompile Include="TechniqueIndicator.cpp">
       <Filter>源文件\Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="SaveData.cpp">
+      <Filter>源文件\Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="MdBroadcast.cpp">
+      <Filter>源文件\Md</Filter>
+    </ClCompile>
+    <ClCompile Include="MdManager.cpp">
+      <Filter>源文件\Md</Filter>
+    </ClCompile>
+    <ClCompile Include="TdManager.cpp">
+      <Filter>源文件\Td</Filter>
+    </ClCompile>
+    <ClCompile Include="TdTradeSpi.cpp">
+      <Filter>源文件\Td</Filter>
+    </ClCompile>
+    <ClCompile Include="TradeManager.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

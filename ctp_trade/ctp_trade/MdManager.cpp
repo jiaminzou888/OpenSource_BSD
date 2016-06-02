@@ -1,17 +1,15 @@
 #include "MdManager.h"
+
 #include "EfficientMap.h"
-#include "GLogWrapper.h"
+#include "TradeManager.h"
 
 #include <algorithm>
 
-
-CMdManager::CMdManager()
+CMdManager::CMdManager(CTradeManager* trade_ptr)
+: md_trade_pointer(trade_ptr)
+, md_(this)
 {
-	char module_dir[MAX_PATH + 1] = { 0 };
-	::GetModuleFileName(nullptr, module_dir, MAX_PATH);
-	root_log_ = module_dir;
 
-	root_log_ = root_log_.substr(0, root_log_.find_last_of("\\")) + "\\glog_log";
 }
 
 bool CMdManager::initial_md_manager(std::vector<std::string>& ins)
@@ -19,9 +17,10 @@ bool CMdManager::initial_md_manager(std::vector<std::string>& ins)
 	// initial capacity of vector
 	bool md_ret = true;
 	
-	CGLog::get_glog()->init_log(root_log_.c_str());
-	md_ret &= redis_.connect_redis_instance();
+	// Md Module
+	set_instruments(ins);
 	md_ret &= md_.initial_md_broadcast(ins);
+	
 
 	return md_ret;
 }
@@ -29,13 +28,11 @@ bool CMdManager::initial_md_manager(std::vector<std::string>& ins)
 void CMdManager::release_md_manager()
 {
 	md_.release_md_broadcast();
-	redis_.free_redis_instance();
-	CGLog::get_glog()->release_log();
 }
 
 bool CMdManager::get_md_conncet_status()
 {
-	return md_.get_connect_flag();
+	return md_.get_md_connect_flag();
 }
 
 bool CMdManager::subscribe_market()
@@ -69,7 +66,34 @@ bool CMdManager::subscribe_market()
 	return sub_ret;
 }
 
-void CMdManager::attach_md_strategy(CStrategy* stg)
+void CMdManager::push_min_data(std::string ins, candle_bar& bar)
 {
-	md_.attach_observer(stg);
+	min_1_base_[ins].push_bar(bar);
+}
+
+bool CMdManager::calculate_decision_kdata(int type)
+{
+	bool cal_ret = true;
+
+	switch (type)
+	{
+	case CCandleBar::MIN_ONE:
+		break;
+	}
+
+	return cal_ret;
+}
+
+void CMdManager::set_instruments(std::vector<std::string>& ins)
+{
+	for (std::string in_ : ins)
+	{
+		CCandleBar data_one;
+		data_one.set_candle_type(CCandleBar::MIN_ONE);
+		efficient_map_operation(min_1_base_, in_, data_one);
+
+		CCandleBar data_five;
+		data_five.set_candle_type(CCandleBar::MIN_FIVE);
+		efficient_map_operation(min_5_base_, in_, data_five);
+	}
 }

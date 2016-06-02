@@ -1,5 +1,6 @@
 #include "MdBroadcast.h"
 
+#include "MdManager.h"
 #include "EfficientMap.h"
 #include "GLogWrapper.h"
 
@@ -7,6 +8,12 @@
 #include <algorithm>
 
 const int max_minute_ticks = 120;
+
+CMdBroadCast::CMdBroadCast(CMdManager* manage_ptr)
+: manager_pointer(manage_ptr)
+{
+
+}
 
 void CMdBroadCast::distribute_tick_function(void* data)
 {
@@ -33,31 +40,9 @@ void CMdBroadCast::calculate_min_function(void* data)
 	}
 }
 
-void CMdBroadCast::notify_min_data(candle_bar& data)
+bool CMdBroadCast::get_md_connect_flag()
 {
-	std::for_each(stg_list_.begin(), stg_list_.end(), [&data](std::shared_ptr<CStrategy>& stg)
-	{
-		stg->update(data);
-	});
-}
-
-void CMdBroadCast::attach_observer(CStrategy* stg)
-{
-	stg_list_.emplace_back(std::shared_ptr<CStrategy>(stg));
-}
-
-void CMdBroadCast::dettach_observer(CStrategy* stg)
-{
-	auto list_it = std::find(stg_list_.begin(), stg_list_.end(), std::shared_ptr<CStrategy>(stg));
-	if (list_it != stg_list_.end())
-	{
-		stg_list_.erase(list_it);
-	}
-}
-
-bool CMdBroadCast::get_connect_flag()
-{
-	return connect_flag_;
+	return connect_md_flag_;
 }
 
 void CMdBroadCast::set_intruments(std::vector<std::string>& ins)
@@ -72,8 +57,7 @@ void CMdBroadCast::set_intruments(std::vector<std::string>& ins)
 		std::vector<mtk_data> tick_vec;
 		tick_vec.reserve(256);
 		efficient_map_operation(tick_base_, ins, tick_vec);
-
-		// Initial Mutex Lock
+		// Initial Tick Mutex Lock
 		efficient_map_operation(tick_mutex_, ins, std::shared_ptr<std::mutex>(new std::mutex));
 
 		// Initial Market Close Flag
@@ -169,7 +153,8 @@ void CMdBroadCast::calculate_process(std::string ins, bool is_open)
 	std::vector<mtk_data> min_ticks;
 
 	// Finding Tail Flag
-	bool has_tail = false;
+	bool	has_tail	= false;
+	size_t	tail_time	= 0;
 
 	auto tick_tail = tick_base_[ins].end() - 1;
 	for (auto tick = tick_base_[ins].begin(); tick != tick_tail; ++tick)
@@ -179,7 +164,8 @@ void CMdBroadCast::calculate_process(std::string ins, bool is_open)
 		auto prev_iter = tick;
 		auto next_iter = tick + 1;
 
-		has_tail = is_minute_tail(prev_iter->UpdateTime, next_iter->UpdateTime);
+		
+		has_tail = is_minute_tail(prev_iter->UpdateTime, next_iter->UpdateTime, tail_time);
 		if (has_tail)
 		{
 			min_ticks.assign(tick_base_[ins].begin(), tick_base_[ins].begin() + real_tick_nums);
@@ -191,8 +177,10 @@ void CMdBroadCast::calculate_process(std::string ins, bool is_open)
 	if (has_tail)
 	{
 		candle_bar min_bar;
+		min_bar.trade_time = tail_time * 100;
 		convert_tick2min(min_ticks, min_bar);
-		notify_min_data(min_bar);	// Every Strategy Maintains One Minute Base Data By Itself
+
+		manager_pointer->push_min_data(min_bar.bar_name, min_bar);
 		print_info(ins.c_str());
 
 		// Erase Used Data
@@ -233,7 +221,7 @@ bool CMdBroadCast::check_mtk_time(char* update_time)
 	return open_flag;
 }
 
-bool CMdBroadCast::is_minute_tail(char* prev_time, char* next_time)
+bool CMdBroadCast::is_minute_tail(char* prev_time, char* next_time, size_t& td_time)
 {
 	// Verdict Head Or Tail In Data Stream
 	size_t prev_t = convert_time_str2int(prev_time) / 100;
@@ -241,6 +229,7 @@ bool CMdBroadCast::is_minute_tail(char* prev_time, char* next_time)
 
 	if (prev_t < next_t)
 	{
+		td_time = prev_t;
 		return true;
 	}
 	else if (prev_t > next_t)
@@ -326,7 +315,7 @@ bool CMdBroadCast::initial_md_broadcast(std::vector<std::string>& ins)
 	md_ret = calculate_thread_.create_thread(calculate_min_function);
 
 	// Start MD Front-End Interface
-	md_api_ = CThostFtdcMdApi::CreateFtdcMdApi("./spi_con/"); // 'spi_con' has to already been prepared in advance
+	md_api_ = CThostFtdcMdApi::CreateFtdcMdApi("./spi_con/md/"); // 'spi_con' has to already been prepared in advance
 	if (md_api_ != nullptr)
 	{
 		md_api_->RegisterSpi(this);
@@ -391,12 +380,12 @@ void CMdBroadCast::OnFrontConnected()
 
 	md_api_->ReqUserLogin(&loginField, 0);
 
-	connect_flag_ = true;
+	connect_md_flag_ = true;
 }
 
 void CMdBroadCast::OnFrontDisconnected(int nReason)
 {
-	connect_flag_ = false;
+	connect_md_flag_ = false;
 }
 
 void CMdBroadCast::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) 

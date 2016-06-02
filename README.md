@@ -9,4 +9,5 @@ The Project Intends To Became A Minimal Platform That Would Support Everyone Who
 3. Add GLog Module For Supporting Debug Log Output to Check Out KData Calculation Temporarily.  —— **April 15th. 2016.**
 4. Modified And Completed The One Minute Bar As The Basis Of All Strategies' Data.  —— **May 5th. 2016.**
 5. Completed The First Edition Of Moving Average Indicator Calculation Class For The MA-Strategy.  —— **May 28th. 2016.**
-6. The Next Step Is To Access To CTP TD Interface For Finishing Trading DEMO Which Is Based On The MA-Strategy.
+6. Reconstruct And Optimize The Trade Architecture; Access To TD Interface.  —— **JUN 2nd. 2016.**
+7. The Next Step Is To Combine MA_Indicator With MA_Strategy And Finish Trading DEMO Which Is Based On it.
