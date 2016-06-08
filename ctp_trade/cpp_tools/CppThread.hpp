@@ -66,6 +66,16 @@ public:
 		_stop.store(flag);
 	}
 
+	inline void set_thread_index(int idx)
+	{
+		_index.store(idx);
+	}
+	
+	inline int get_thread_index()
+	{
+		return _index.load();
+	}
+
 private:
 	std::thread			_self;						// real thread object
 	function_type		_function{ nullptr };		// real thread function
@@ -73,4 +83,6 @@ private:
 
 	std::atomic<bool>	_stop{ true };
 	std::atomic<bool>	_exit{ true };
+
+	std::atomic<int>	_index{ 0 };	// several threads flag which call the same function
 };

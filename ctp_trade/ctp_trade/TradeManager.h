@@ -15,7 +15,7 @@ public:
 
 	void attach_trade_strategy(CStrategy* stg);
 	void dettach_trade_strategy(CStrategy* stg);
-	void notify_decision_data(candle_bar& bar);
+	void notify_decision_data(int period, candle_bar& bar);
 
 private:
 	void load_all_interested_ins(std::vector<std::string>& vec_strs);

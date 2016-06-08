@@ -10,7 +10,7 @@ public:
 
 	// basic
 	bool valid_tech_signal(int signal);
-	bool asset_calculate_parameters(int date_index, int periods);
+	bool access_calculate_parameters(int date_index, int periods);
 	
 	// utility
 	int get_fork_signal(int date_index, std::vector<int> period_cycle, int type, int gold_fork, int dead_fork, int& action_reason);

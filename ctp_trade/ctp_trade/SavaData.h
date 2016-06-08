@@ -2,6 +2,12 @@
 
 #include "PublicDataStruct.h"
 
+struct archive_data
+{
+	int period{ 0 };
+	candle_bar data;
+};
+
 class CSaveData
 {
 public:
@@ -10,7 +16,7 @@ public:
 	bool open_save_data(std::string& stg);
 	void close_save_data();
 
-	void write_save_data(candle_bar& data);
+	void write_save_data(archive_data& data);
 
 private:
 	std::string  root_dir_;

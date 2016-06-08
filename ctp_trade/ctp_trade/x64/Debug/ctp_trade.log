@@ -1,4 +1,4 @@
-﻿生成启动时间为 2016/6/2 18:06:25。
+﻿生成启动时间为 2016/6/8 17:54:30。
      1>项目“E:\OpenSource_BSD\ctp_trade\ctp_trade\ctp_trade.vcxproj”在节点 2 上(Build 个目标)。
      1>ClCompile:
          D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /I.\..\tradeapi /I.\..\cpp_tools /I.\..\redis\src /I.\..\redis\deps\hiredis /I.\..\glog\src /Zi /nologo /W3 /WX- /sdl /Od /D _DEBUG /D _CONSOLE /D _LIB /D USE_STATIC /D USE_JEMALLOC /D _OFF_T_DEFINED /D USE_DL_PREFIX /D LACKS_STDLIB_H /D NO_QFORKIMPL /D WIN32_IOCP /D _CRT_SECURE_NO_WARNINGS /D PSAPI_VERSION=1 /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Debug\\" /Fd"x64\Debug\vc120.pdb" /Gd /TP /errorReport:prompt CandleBar.cpp ctp_trade.cpp GLogWrapper.cpp MdBroadcast.cpp MdManager.cpp RedisWrapper.cpp SaveData.cpp Strategy.cpp TdManager.cpp TdTradeSpi.cpp TechniqueIndicator.cpp TradeManager.cpp
@@ -38,4 +38,4 @@
 
 生成成功。
 
-已用时间 00:00:08.95
+已用时间 00:00:09.45

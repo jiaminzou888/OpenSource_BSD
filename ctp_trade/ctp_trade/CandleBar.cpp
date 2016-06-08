@@ -32,7 +32,57 @@ void CCandleBar::push_bar(candle_bar& bar)
 	candles_.emplace_back(bar);
 }
 
-void CCandleBar::get_bars(std::vector<candle_bar>& target)
+bool CCandleBar::calculate_specified_period(size_t strat_pos, int compose_mutiple, candle_bar& des_bar)
+{
+	std::lock_guard<std::mutex> lck(*mutex_);
+
+	if (candles_.size() > strat_pos + compose_mutiple)
+	{
+		int src_count = 0;
+
+		auto start_iterator = candles_.begin() + strat_pos;
+		for_each(start_iterator, start_iterator + compose_mutiple, [&src_count, &des_bar, compose_mutiple](candle_bar& src_bar)
+		{
+			src_count++;
+			if (1 == src_count)
+			{
+				memcpy_s(&des_bar, sizeof(des_bar), &src_bar, sizeof(des_bar));
+			}
+			else
+			{
+				des_bar.volume_size += src_bar.volume_size;
+
+				des_bar.close_price = src_bar.close_price;
+
+				if (abs(des_bar.high_price - src_bar.high_price) < 0.000001)
+				{
+					des_bar.high_price = src_bar.high_price;
+				}
+
+				if (abs(des_bar.low_price - src_bar.low_price) > 0.000001)
+				{
+					des_bar.low_price = src_bar.low_price;
+				}
+			}
+
+			if (compose_mutiple == src_count)
+			{
+				des_bar.change_point = des_bar.close_price - des_bar.open_price;
+				des_bar.change_percent = (des_bar.change_point / des_bar.open_price) * 100.;
+
+				src_count = 0;
+			}
+		});
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void CCandleBar::get_bars_and_clear(std::vector<candle_bar>& target)
 {
 	std::lock_guard<std::mutex> lck(*mutex_);
 
@@ -51,23 +101,23 @@ CCandleBar& CCandleBar::operator + (const std::vector<candle_bar>& target)
 	return *this;
 }
 
-void CCandleBar::convert_kdata(CCandleBar& des_candles, size_t multiple)
+void CCandleBar::convert_kdata_and_clear(size_t compose_mutiple, CCandleBar& des_candles)
 {
 	std::lock_guard<std::mutex> lck(*mutex_);
 
 	size_t candle_nums = candles_.size();
 
-	if (multiple < 2 || candle_nums < multiple)
+	if (compose_mutiple < 2 || candle_nums < compose_mutiple)
 	{
 		return;
 	}
 
-	// Always Prefer Catching The Newest Data
+	// Total Calculation And Replacement
 	int src_count = 0;
 	candle_bar des_bar;
-	size_t end_pos = candle_nums % multiple;
+	size_t end_pos = candle_nums % compose_mutiple;
 
-	std::for_each(candles_.begin(), candles_.end() - end_pos, [&src_count, &des_bar, &multiple, &des_candles](candle_bar& src_bar)
+	std::for_each(candles_.begin(), candles_.end() - end_pos, [&src_count, &des_bar, &compose_mutiple, &des_candles](candle_bar& src_bar)
 	{
 		src_count ++;
 		if (1 == src_count)
@@ -80,21 +130,21 @@ void CCandleBar::convert_kdata(CCandleBar& des_candles, size_t multiple)
 
 			des_bar.close_price = src_bar.close_price;
 
-			if (des_bar.high_price < src_bar.high_price)
+			if (abs(des_bar.high_price - src_bar.high_price) < 0.000001)
 			{
 				des_bar.high_price = src_bar.high_price;
 			}
 
-			if (des_bar.low_price > src_bar.low_price)
+			if (abs(des_bar.low_price - src_bar.low_price) > 0.000001)
 			{
 				des_bar.low_price = src_bar.low_price;
 			}
 		}
 
-		if (multiple == src_count)
+		if (compose_mutiple == src_count)
 		{
 			des_bar.change_point	= des_bar.close_price - des_bar.open_price;
-			des_bar.change_percent	= des_bar.change_point / des_bar.open_price;
+			des_bar.change_percent	= (des_bar.change_point / des_bar.open_price) * 100.;
 
 			src_count = 0;
 			des_candles.push_bar(des_bar);

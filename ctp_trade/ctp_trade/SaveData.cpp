@@ -29,7 +29,7 @@ void CSaveData::close_save_data()
 	save_file_.close();
 }
 
-void CSaveData::write_save_data(candle_bar& data)
+void CSaveData::write_save_data(archive_data& data)
 {
-	save_file_.write((char*)&data, sizeof(candle_bar));
+	save_file_.write((char*)&data, sizeof(archive_data));
 }

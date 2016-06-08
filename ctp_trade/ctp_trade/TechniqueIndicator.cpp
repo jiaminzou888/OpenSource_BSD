@@ -17,7 +17,7 @@ bool CTechniqueIndicator::valid_tech_signal(int signal)
 	return (signal >= TECH_SIGNAL_MIN && signal <= TECH_SIGNAL_MAX);
 }
 
-bool CTechniqueIndicator::asset_calculate_parameters(int date_index, int periods)
+bool CTechniqueIndicator::access_calculate_parameters(int date_index, int periods)
 {
 	if (!base_kdata.get() || date_index < 0 || date_index >= base_kdata->get_candle_size() || periods <= 0)
 	{
@@ -256,7 +256,7 @@ Note: a = 2 / (n+1)
 */
 bool CMovingAverage::calculate(int date_index, int periods, int type, bool use_last, double& data)
 {
-	if (!asset_calculate_parameters(date_index, periods))
+	if (!access_calculate_parameters(date_index, periods))
 	{
 		return false;
 	}

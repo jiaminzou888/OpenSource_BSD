@@ -82,6 +82,11 @@ void CMdBroadCast::get_instrument_name(char**& inst_ptr, size_t ins_size)
 	}
 }
 
+std::vector<std::string> CMdBroadCast::get_instruments()
+{
+	return subscribe_inst_;
+}
+
 void CMdBroadCast::distribute_mtk_tick()
 {
 	std::lock_guard<std::mutex> lck(*sub_mutex_);
@@ -179,8 +184,8 @@ void CMdBroadCast::calculate_process(std::string ins, bool is_open)
 		candle_bar min_bar;
 		min_bar.trade_time = tail_time * 100;
 		convert_tick2min(min_ticks, min_bar);
-
-		manager_pointer->push_min_data(min_bar.bar_name, min_bar);
+		// push original 1 minute to MdManager
+		manager_pointer->push_min_one_data(min_bar.bar_name, min_bar);
 		print_info(ins.c_str());
 
 		// Erase Used Data
@@ -262,7 +267,7 @@ void CMdBroadCast::convert_tick2min(std::vector<mtk_data>& tick_vec, candle_bar&
 	min_bar.high_price = min_bar.open_price;
 	min_bar.low_price = min_bar.open_price;
 
-	std::for_each(tick_vec.begin(), tick_vec.end(), [&tick_vec, &min_bar](mtk_data& dt)
+	std::for_each(tick_vec.begin(), tick_vec.end(), [&min_bar](mtk_data& dt)
 	{
 		if (dt.LastPrice > min_bar.high_price)
 		{

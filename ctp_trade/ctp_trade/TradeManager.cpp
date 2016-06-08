@@ -69,11 +69,11 @@ void CTradeManager::dettach_trade_strategy(CStrategy* stg)
 	}
 }
 
-void CTradeManager::notify_decision_data(candle_bar& bar)
+void CTradeManager::notify_decision_data(int period, candle_bar& bar)
 {
-	for_each(stg_list_.begin(), stg_list_.end(), [&bar](std::shared_ptr<CStrategy>& stg)
+	for_each(stg_list_.begin(), stg_list_.end(), [period, &bar](std::shared_ptr<CStrategy>& stg)
 	{
-		stg->update(bar);
+		stg->update(period, bar);
 	});
 }
 

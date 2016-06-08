@@ -16,9 +16,11 @@ public:
 	CMdBroadCast(CMdManager* manage_ptr);
 
 	bool	get_md_connect_flag();
+
 	void	set_intruments(std::vector<std::string>& ins);
 	size_t	get_instruments_size();
 	void	get_instrument_name(char**& inst_ptr, size_t ins_size);
+	std::vector<std::string> get_instruments();
 
 	static void distribute_tick_function(void* data);
 	void distribute_mtk_tick();
