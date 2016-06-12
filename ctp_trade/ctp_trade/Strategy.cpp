@@ -208,7 +208,7 @@ void CMAStrategy::calculate_indicator_function(void* data)
 				int action_reason = TECH_REASON_NOTHING;
 				int action = ma.get_signal(pos++, CCandleBar::CLOSE, action_reason);
 				// Trigger Action
-				handle_ma->trigger_signal_action(action, action_reason);
+				handle_ma->trigger_signal_action(inst, action, action_reason, ma.get_last_price(CCandleBar::CLOSE));
 			});
 		});
 	}
@@ -269,13 +269,20 @@ void CMAStrategy::release_ma_stg()
 	indicator_thread_.close_thread();
 }
 
-void CMAStrategy::trigger_signal_action(int action, int action_reason)
+void CMAStrategy::trigger_signal_action(std::string ins, int action, int action_reason, double action_price)
 {
+	std::lock_guard<std::mutex> lck(operation_rule_.lock_mtx);
+
 	if (SIGNAL_ISBUY(action))
 	{
 		if (action_reason == TECH_REASON_GOLDFORK)
 		{
 			// Golden Fork
+			operation_rule_.instrument = ins;
+			operation_rule_.action = action;
+			operation_rule_.quantity = 1;		// Confirm From Position Holding Module
+			operation_rule_.price = action_price;
+			
 		}
 		else if (action_reason == TECH_REASON_LONG)
 		{
@@ -291,6 +298,12 @@ void CMAStrategy::trigger_signal_action(int action, int action_reason)
 		if (action_reason == TECH_REASON_DEADFORK)
 		{
 			// Dead Fork
+			operation_rule_.instrument = ins;
+			operation_rule_.action = action;
+			operation_rule_.quantity = 1;		// Confirm From Position Holding Module
+			operation_rule_.price = action_price;
+
+
 		}
 		else if (action_reason == TECH_REASON_SHORT)
 		{

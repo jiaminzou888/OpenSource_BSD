@@ -15,6 +15,23 @@ CTradeManager::CTradeManager()
 	root_log_ = root_log_.substr(0, root_log_.find_last_of("\\")) + "\\glog_log";
 }
 
+void CTradeManager::trade_process_function(void* data)
+{
+	CppThread*		handle_thread	= static_cast<CppThread*>(data);
+	CTradeManager*	handle_trade	= static_cast<CTradeManager*>(handle_thread->get_data());
+
+	while (!handle_thread->is_stop())
+	{
+		// It Could Be Updated When Detach_Stg Happen
+		size_t	thread_id = handle_thread->get_thread_index();
+		// Waiting For Trade Notification
+		
+
+		// Do Something If Getting The Trade Signal
+
+	}
+}
+
 bool CTradeManager::initial_trader()
 {
 	bool trade_ret = true;
@@ -57,21 +74,54 @@ void CTradeManager::release_trader()
 
 void CTradeManager::attach_trade_strategy(CStrategy* stg)
 {
-	stg_list_.emplace_back(std::shared_ptr<CStrategy>(stg));
+	// Attach A New Strategy
+	stg_container_.emplace_back(std::shared_ptr<CStrategy>(stg));
+	// Open The Corresponding Thread
+	CppThread* stg_thread = new CppThread;
+	stg_thread->set_data(this);
+	stg_thread->set_thread_index(stg_container_.size()+1);
+	stg_thread->create_thread(trade_process_function);
+	stg_threads_.push_back(std::shared_ptr<CppThread>(stg_thread));
 }
 
-void CTradeManager::dettach_trade_strategy(CStrategy* stg)
+void CTradeManager::detach_trade_strategy(CStrategy* stg)
 {
-	auto list_it = std::find(stg_list_.begin(), stg_list_.end(), std::shared_ptr<CStrategy>(stg));
-	if (list_it != stg_list_.end())
+	// Find The Strategy That Will Be Detached
+	int	   stg_index  = 0;
+	auto   stg_iteta  = stg_container_.begin();
+	for (; stg_iteta != stg_container_.end(); ++stg_iteta)
 	{
-		stg_list_.remove(*list_it);
+		if (stg == stg_iteta->get())
+		{
+			break;
+		}
+		else
+		{
+			++stg_index;
+		}
+	}
+	
+	// If stg Existed,
+	if (stg_index != stg_container_.size())
+	{
+		// Close And Erase The Thread,
+		stg_threads_[stg_index]->close_thread();
+		stg_threads_.erase(stg_threads_.begin() + stg_index);
+		// Update The Rest Of 'thread_id',
+		for (auto thread_id_it = stg_threads_.begin() + stg_index; thread_id_it != stg_threads_.end(); ++thread_id_it)
+		{
+			size_t old_id = thread_id_it->get()->get_thread_index();
+			thread_id_it->get()->set_thread_index(old_id - 1);
+		}
+
+		// Detach The Corresponding Strategy.
+		stg_container_.erase(stg_iteta);
 	}
 }
 
 void CTradeManager::notify_decision_data(int period, candle_bar& bar)
 {
-	for_each(stg_list_.begin(), stg_list_.end(), [period, &bar](std::shared_ptr<CStrategy>& stg)
+	for_each(stg_container_.begin(), stg_container_.end(), [period, &bar](std::shared_ptr<CStrategy>& stg)
 	{
 		stg->update(period, bar);
 	});

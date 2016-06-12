@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
 
 	ma_stg.release_ma_stg();
 
-	trader.dettach_trade_strategy(&ma_stg);
+	trader.detach_trade_strategy(&ma_stg);
 
 	trader.release_trader();
 

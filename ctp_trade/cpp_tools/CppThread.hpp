@@ -66,12 +66,12 @@ public:
 		_stop.store(flag);
 	}
 
-	inline void set_thread_index(int idx)
+	inline void set_thread_index(size_t idx)
 	{
 		_index.store(idx);
 	}
 	
-	inline int get_thread_index()
+	inline size_t get_thread_index()
 	{
 		return _index.load();
 	}
@@ -84,5 +84,5 @@ private:
 	std::atomic<bool>	_stop{ true };
 	std::atomic<bool>	_exit{ true };
 
-	std::atomic<int>	_index{ 0 };	// several threads flag which call the same function
+	std::atomic<size_t>	_index{ 0 };	// several threads flag which call the same function
 };

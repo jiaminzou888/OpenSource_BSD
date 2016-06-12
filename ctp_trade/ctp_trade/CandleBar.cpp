@@ -154,7 +154,7 @@ void CCandleBar::convert_kdata_and_clear(size_t compose_mutiple, CCandleBar& des
 	candles_.erase(candles_.begin(), candles_.end() - end_pos);
 }
 
-bool CCandleBar::get_ma(int date_index, int periods, int type, double& data)
+bool CCandleBar::get_ma(size_t date_index, int periods, int type, double& data)
 {
 	std::lock_guard<std::mutex> lck(*mutex_);
 
@@ -166,7 +166,7 @@ bool CCandleBar::get_ma(int date_index, int periods, int type, double& data)
 	int		k_count = 0;
 	double	ma_data = 0;
 
-	for (int i = date_index; i >= 0; --i)
+	for (size_t i = date_index; i >= 0; --i)
 	{
 		ma_data += get_price(date_index, type);
 		k_count++;
@@ -185,7 +185,7 @@ void CCandleBar::insert_candles_backward(const std::vector<candle_bar>& target)
 	candles_.insert(candles_.end(), target.begin(), target.end());
 }
 
-double CCandleBar::get_price(int date_index, int type)
+double CCandleBar::get_price(size_t date_index, int type)
 {
 	candle_bar& bar = candles_[date_index];
 

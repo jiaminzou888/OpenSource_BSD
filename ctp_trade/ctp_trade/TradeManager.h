@@ -10,11 +10,13 @@ class CTradeManager
 public:
 	CTradeManager();
 
+	static void trade_process_function(void* data);
+
 	bool initial_trader();
 	void release_trader();
 
 	void attach_trade_strategy(CStrategy* stg);
-	void dettach_trade_strategy(CStrategy* stg);
+	void detach_trade_strategy(CStrategy* stg);
 	void notify_decision_data(int period, candle_bar& bar);
 
 private:
@@ -22,7 +24,10 @@ private:
 
 private:
 	std::string		root_log_;
-	std::list<std::shared_ptr<CStrategy>>	stg_list_;	// Registered Strategies
+
+	std::vector<std::shared_ptr<CppThread>>	stg_threads_;				// Strategies Thread
+	std::vector<std::shared_ptr<CStrategy>>	stg_container_;	// Registered Strategies
+	
 
 private:
 	CRedisWrapper	redis_;

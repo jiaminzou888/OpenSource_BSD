@@ -19,14 +19,19 @@ public:
 
 	void update(int period, candle_bar& stg_data);
 
+	virtual void trigger_signal_action(std::string ins, int action, int action_reason, double action_price) = 0;	// Pure Virtual Mechanism That Notify TradeManager To Insert Specified Order
+
 protected:
 	int	decision_data_type{ 0 };
 
 	std::string config_head_;
-	std::map<int, std::map<std::string, CCandleBar>> decision_data_;			// Period-Cycle Data That The Strategy Needs. 
-																				// int: Period-Cycle, map: Focused Instruments That On 'int' Periods
-																				// 'int' are corresponding to CCandleBar::Min_ONE etc.
-	CSaveData save_min_data;
+	std::map<int, std::map<std::string, CCandleBar>> decision_data_;		// Period-Cycle Data That The Strategy Needs. 
+																			// int: Period-Cycle, map: Focused Instruments That On 'int' Periods
+																			// 'int' Are Corresponding To CCandleBar::Min_ONE etc.
+
+	operation_attribute	operation_rule_;	// Operation Direction And Corresponding Attributes. 	
+	
+	CSaveData save_min_data;				// Data Save Module
 
 private:
 	bool load_focused_inst(std::string& config_path, std::string& config_head, int k_type);
@@ -42,12 +47,12 @@ public:
 	bool initial_ma_stg(std::string config_path, std::string config_head, int k_type);
 	void release_ma_stg();
 
-private:
-	void trigger_signal_action(int action, int action_reason);
+	void trigger_signal_action(std::string ins, int action, int action_reason, double action_price);
 
 private:
 	std::map<int, std::map<std::string, int>> calculate_position_flag_;			// Moving Average 'date_index' Flag	
 	std::map<int, std::map<std::string, CMovingAverage>> decision_tech_ma_;		// Moving Average Base On CandleBar
 
-	CppThread indicator_thread_;
+	
+	CppThread		indicator_thread_;
 };

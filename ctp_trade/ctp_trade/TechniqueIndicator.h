@@ -24,6 +24,7 @@ public:
 	// operation
 	virtual int  get_signal(int date_index, int type, int& reason);
 	virtual bool get_minmax_info(int beg_date, int end_date, double& min_data, double& max_data);
+	virtual double get_last_price(int type);
 
 	// calculation
 	virtual bool calculate(int date_index, int periods, int type, bool use_last, double& data); // Moving Average

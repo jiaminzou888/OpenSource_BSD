@@ -189,6 +189,12 @@ bool CTechniqueIndicator::get_minmax_info(int beg_date, int end_date, double& mi
 	return false;
 }
 
+double CTechniqueIndicator::get_last_price(int type)
+{
+	size_t last_index = base_kdata->get_candle_size() - 1;
+	return base_kdata->get_price(last_index, type);
+}
+
 bool CTechniqueIndicator::calculate(int date_index, int periods, int type, bool use_last, double& data)
 {
 	return false;

@@ -43,7 +43,7 @@ void CMdManager::calculate_md_base_function(void* data)
 	CppThread*		handle_th	= static_cast<CppThread*>(data);
 	CMdManager*		handle_md	= static_cast<CMdManager*>(handle_th->get_data());
 	
-	int	thread_id				= handle_th->get_thread_index();
+	size_t	thread_id			= handle_th->get_thread_index();
 	CMdDataSet&	base_one_minute = handle_md->basic_minute_kdata_[ONE];
 	std::vector<std::string> focus_instr = handle_md->md_broadcast_.get_instruments();
 
@@ -156,7 +156,7 @@ bool CMdManager::initial_checkup_table()
 	return true;
 }
 
-int  CMdManager::convert_datano_to_ktype(int thread_id)
+int  CMdManager::convert_datano_to_ktype(size_t thread_id)
 {
 	int convert_type = -1;
 

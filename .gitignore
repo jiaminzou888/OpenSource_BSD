@@ -1,0 +1,10 @@
+/ctp_trade/ctp_trade/Debug/*
+/ctp_trade/ctp_trade/spi_con/md/*
+/ctp_trade/ctp_trade/spi_con/td/*
+/ctp_trade/ctp_trade/x64/*
+/ctp_trade/ipch/*
+/ctp_trade/x64/Debug/glog_log/*
+!/ctp_trade/x64/Debug/*.ini
+!/ctp_trade/x64/Debug/*.dll
+/ctp_trade/*.sdf
+/ctp_trade/*.opensdf

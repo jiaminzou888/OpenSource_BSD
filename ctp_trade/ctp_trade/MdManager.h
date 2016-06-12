@@ -49,13 +49,13 @@ public:
 
 private:
 	bool initial_checkup_table();
-	int  convert_datano_to_ktype(int thread_id);
+	int  convert_datano_to_ktype(size_t thread_id);
 
 	bool open_calculate_thread(std::vector<std::string>& ins);
 	void close_calculate_thread();
 
 private:
-	std::map<int, int>	checkup_table;					// Based On One Minute
+	std::map<size_t, int>	checkup_table;			// Based On One Minute
 
 	CppThread	 calculate_thread_[5];
 	CMdDataSet	 basic_minute_kdata_[5];

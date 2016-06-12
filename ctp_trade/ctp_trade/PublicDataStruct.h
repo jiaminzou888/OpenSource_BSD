@@ -105,6 +105,22 @@ struct trade_handle
 	}
 };
 
+struct operation_attribute
+{
+	int action{ 0 };
+	int quantity{ 0 };
+	double price{ 0.0 };
+
+	struct  
+	{
+		double	commission_rate{ 0.0 };
+		int		point_spread{ 0 };
+	}tax_fee;
+
+	std::string instrument;
+	std::mutex  lock_mtx;
+};
+
 struct tech_attribute
 {
 	int attribute_type{ 0 };
