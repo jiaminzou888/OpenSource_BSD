@@ -187,6 +187,13 @@ void CCandleBar::insert_candles_backward(const std::vector<candle_bar>& target)
 
 double CCandleBar::get_price(size_t date_index, int type)
 {
+	std::lock_guard<std::mutex> lck(*mutex_);
+
+	if (candles_.size() <= date_index)
+	{
+		return 0.0;
+	}
+
 	candle_bar& bar = candles_[date_index];
 
 	double price = 0;

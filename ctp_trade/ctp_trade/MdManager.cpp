@@ -5,7 +5,6 @@
 
 #include <algorithm>
 
-
 void CMdDataSet::initial_dataset(int type, std::vector<std::string>& ins)
 {
 	dataset_type	= type;
@@ -117,7 +116,7 @@ bool CMdManager::subscribe_market()
 			break;
 		}
 	}
-	
+
 	delete[] instr;
 	instr = nullptr;
 

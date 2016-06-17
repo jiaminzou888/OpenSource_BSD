@@ -43,8 +43,8 @@ const int TECH_REASON_SHORT		= 7;
 
 struct candle_bar
 {
-	mtk_data_name		bar_name;
-	mtk_data_exchange	bar_ecg;
+	TThostFtdcInstrumentIDType	bar_name;
+	TThostFtdcExchangeIDType	bar_ecg;
 
 	size_t trade_day;
 	size_t trade_time;
@@ -68,6 +68,10 @@ struct candle_bar
 struct td_attribute
 {
 	CThostFtdcRspInfoField response_msg;
+
+	TThostFtdcBrokerIDType broker_id;
+	TThostFtdcInvestorIDType user_id;
+	TThostFtdcPasswordType pass_word;
 
 	int front_id;
 	int session_id;
@@ -103,22 +107,6 @@ struct trade_handle
 		ready_flag = true;
 		cv.notify_all();
 	}
-};
-
-struct operation_attribute
-{
-	int action{ 0 };
-	int quantity{ 0 };
-	double price{ 0.0 };
-
-	struct  
-	{
-		double	commission_rate{ 0.0 };
-		int		point_spread{ 0 };
-	}tax_fee;
-
-	std::string instrument;
-	std::mutex  lock_mtx;
 };
 
 struct tech_attribute

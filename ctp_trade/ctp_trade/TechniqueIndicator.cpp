@@ -1,5 +1,6 @@
 #include "TechniqueIndicator.h"
 
+#include <algorithm>
 
 CTechniqueIndicator::CTechniqueIndicator(CCandleBar& data)
 : base_kdata(&data)
@@ -178,7 +179,7 @@ void CTechniqueIndicator::attach_parameters(tech_attribute* attr)
 }
 
 // operation
-int  CTechniqueIndicator::get_signal(int date_index, int type, int& reason)
+int  CTechniqueIndicator::get_signal(int type, int& reason)
 {
 	reason = TECH_REASON_NOTHING;
 	return TECH_SIGNAL_NOTHING;
@@ -187,12 +188,6 @@ int  CTechniqueIndicator::get_signal(int date_index, int type, int& reason)
 bool CTechniqueIndicator::get_minmax_info(int beg_date, int end_date, double& min_data, double& max_data)
 {
 	return false;
-}
-
-double CTechniqueIndicator::get_last_price(int type)
-{
-	size_t last_index = base_kdata->get_candle_size() - 1;
-	return base_kdata->get_price(last_index, type);
 }
 
 bool CTechniqueIndicator::calculate(int date_index, int periods, int type, bool use_last, double& data)
@@ -230,9 +225,9 @@ void CMovingAverage::set_default_parameters()
 	attribute.flag_short		= TECH_SIGNAL_SELL;
 
 	attribute.period_cycle.clear();
+	attribute.period_cycle.push_back(2);
+	attribute.period_cycle.push_back(3);
 	attribute.period_cycle.push_back(5);
-	attribute.period_cycle.push_back(10);
-	attribute.period_cycle.push_back(20);
 }
 
 void CMovingAverage::attach_parameters(tech_attribute* attr)
@@ -317,16 +312,70 @@ bool CMovingAverage::calculate(int date_index, int periods, int type, bool use_l
 	return true;
 }
 
-int  CMovingAverage::get_signal(int date_index, int type, int& reason)
+bool CMovingAverage::is_basic_data_ready()
 {
-	// If Signal Struck The Gold Or Dead Fork
+	if (!initial_read_pos_flag)
+	{
+		// Find The Maximum Period
+		int period_max = 0;
+		for_each(attribute.period_cycle.begin(), attribute.period_cycle.end(), [&period_max](int pd)
+		{
+			if (period_max < pd)
+			{
+				period_max = pd;
+			}
+		});
+
+		// If Data Is Ready
+		if (base_kdata->get_candle_size() > period_max)
+		{
+			candle_bar_read_pos = period_max;
+
+			initial_read_pos_flag = true;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return true;
+	}
+}
+
+double CMovingAverage::get_limit_price(int type)
+{
+	return base_kdata->get_price(candle_bar_read_pos, type);
+}
+
+int  CMovingAverage::get_signal(int type, int& reason)
+{
+	int date_index = candle_bar_read_pos;
+
 	int signal = get_fork_signal(date_index, attribute.period_cycle, type, attribute.flag_goldfork, attribute.flag_deadfork, reason);
 	if (SIGNAL_ISBUY(signal) || SIGNAL_ISSELL(signal))
 	{
+		// If Signal Struck The Gold Or Dead Fork
+		if (base_kdata->get_candle_size() > date_index)
+		{
+			candle_bar_read_pos++;
+		}
+		
 		return signal;
 	}
-	// Or Not
-	return get_trend_signal(date_index, attribute.period_cycle, type, attribute.flag_long, attribute.flag_short, reason);
+	else
+	{
+		// Or Not
+		signal =  get_trend_signal(date_index, attribute.period_cycle, type, attribute.flag_long, attribute.flag_short, reason);
+		if (base_kdata->get_candle_size() > date_index)
+		{
+			candle_bar_read_pos++;
+		}
+
+		return signal;
+	}
 }
 
 bool CMovingAverage::get_minmax_info(int beg_date, int end_date, double& min_data, double& max_data)

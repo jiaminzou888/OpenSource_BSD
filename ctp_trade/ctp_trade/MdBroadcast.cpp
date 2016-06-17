@@ -9,6 +9,136 @@
 
 const int max_minute_ticks = 120;
 
+#ifndef _TRADE_TIME_
+#include <chrono>
+
+bool CMdBroadCast::initial_fake_tick_data()
+{
+	std::ifstream	csv_in("..\\x64\\Debug\\rb1610_20160331.csv");
+	std::string		string_line = "";
+	int	line_idx = 0;
+
+	// skip the first two lines
+	getline(csv_in, string_line);
+	getline(csv_in, string_line);
+	while (getline(csv_in, string_line))
+	{
+		instrument_tick_one_day[line_idx++] = string_line;
+	}
+
+	distribute_fake_thread.set_data(this);
+	distribute_fake_thread.create_thread(distribute_fake_tick_function);
+
+	return true;
+}
+
+void CMdBroadCast::release_fake_tick_data()
+{
+	distribute_fake_thread.close_thread();
+
+	if (!instrument_tick_one_day.empty())
+	{
+		instrument_tick_one_day.clear();
+	}
+}
+
+void CMdBroadCast::transfer_fake_to_tick_data(int& data_index, int& total_volum, mtk_data& tick)
+{
+	int fake_size = (int)instrument_tick_one_day.size();
+	if (data_index >= fake_size)
+	{
+		data_index = data_index % fake_size;
+	}
+
+	std::string fake_string = instrument_tick_one_day[data_index++];
+
+	// Position Instruments
+	int count_index = 0;
+	std::string sub_string = "";
+
+	size_t beg_pos = 0;
+	size_t ins_pos = fake_string.find_first_of(",");
+	while (std::string::npos != ins_pos)
+	{
+		sub_string = fake_string.substr(beg_pos, ins_pos - beg_pos);
+
+		if (1 == count_index)
+		{
+			strncpy_s(tick.InstrumentID, sub_string.c_str(), sizeof(tick.InstrumentID)-1);
+		}
+		else if (2 == count_index)
+		{
+			size_t blank_pos = sub_string.find_first_of(" ");
+			std::string trade_day = sub_string.substr(0, blank_pos);
+			trade_day.erase(std::remove_if(trade_day.begin(), trade_day.end(), [](char c){ return c == '-'; }), trade_day.end());
+			strncpy_s(tick.TradingDay, trade_day.c_str(), sizeof(tick.TradingDay) - 1);
+			strncpy_s(tick.ActionDay, trade_day.c_str(), sizeof(tick.ActionDay) - 1);
+
+			sub_string = sub_string.substr(blank_pos + 1, sub_string.size() - blank_pos);
+			blank_pos = sub_string.find_first_of(".");
+			std::string update_time = sub_string.substr(0, blank_pos);
+			strncpy_s(tick.UpdateTime, update_time.c_str(), sizeof(tick.UpdateTime) - 1);
+		}
+		else if (3 == count_index)
+		{
+			tick.LastPrice = atoi(sub_string.c_str());
+		}
+		else if (7 == count_index)
+		{
+			total_volum += atoi(sub_string.c_str());
+			tick.Volume = total_volum;
+		}
+		else if (12 == count_index)
+		{
+			tick.BidPrice1 = atoi(sub_string.c_str());
+		}
+		else if (13 == count_index)
+		{
+			tick.AskPrice1 = atoi(sub_string.c_str());
+		}
+		else if (14 == count_index)
+		{
+			tick.BidVolume1 = atoi(sub_string.c_str());
+		}
+		else
+		{
+
+		}
+
+		beg_pos = ins_pos + 1;
+		ins_pos = fake_string.find_first_of(",", beg_pos);
+
+		count_index++;
+	}
+	if (ins_pos > beg_pos)
+	{
+		sub_string = fake_string.substr(beg_pos, ins_pos - beg_pos);
+		tick.AskVolume1 = atoi(sub_string.c_str());
+	}
+}
+
+void CMdBroadCast::distribute_fake_tick_function(void* data)
+{
+	CppThread*		handle_th = static_cast<CppThread*>(data);
+	CMdBroadCast*	handle_md = static_cast<CMdBroadCast*>(handle_th->get_data());
+
+	int fake_data_index		= 0;
+	int fake_total_volum	= 0;
+	while (!handle_th->is_stop())
+	{
+		mtk_data tick_data;
+		memset(&tick_data, 0x00, sizeof(mtk_data));
+		handle_md->transfer_fake_to_tick_data(fake_data_index, fake_total_volum, tick_data);
+
+		std::lock_guard<std::mutex> lck(*(handle_md->sub_mutex_));
+		handle_md->sub_ticks_.emplace_back(tick_data);
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+	}
+}
+
+#endif 	// _TEST_CODE_
+
 CMdBroadCast::CMdBroadCast(CMdManager* manage_ptr)
 : manager_pointer(manage_ptr)
 {
@@ -209,8 +339,9 @@ size_t  CMdBroadCast::convert_time_str2int(char* update_time)
 
 bool CMdBroadCast::check_mtk_time(char* update_time)
 {
-	bool open_flag = false;
+	bool open_flag = true;
 
+#ifdef _TRADE_TIME_
 	// Check Out If Market Opened (Opened Time Range Are Gotten From Config File Later)
 	size_t market_time_int = convert_time_str2int(update_time);
 	// IF16XX Open Time Range As An Example
@@ -222,6 +353,7 @@ bool CMdBroadCast::check_mtk_time(char* update_time)
 	{
 		open_flag = false;
 	}
+#endif // _TRADE_TIME_
 
 	return open_flag;
 }
@@ -252,8 +384,8 @@ void CMdBroadCast::convert_tick2min(std::vector<mtk_data>& tick_vec, candle_bar&
 	mtk_data& last_data = tick_vec.back();
 
 	// Initial Basic Information
-	strncpy_s(min_bar.bar_name, first_data.InstrumentID, sizeof(mtk_data_name));
-	strncpy_s(min_bar.bar_ecg, first_data.ExchangeID, sizeof(mtk_data_exchange));
+	strncpy_s(min_bar.bar_name, first_data.InstrumentID, sizeof(TThostFtdcInstrumentIDType)-1);
+	strncpy_s(min_bar.bar_ecg, first_data.ExchangeID, sizeof(TThostFtdcExchangeIDType)-1);
 
 	min_bar.trade_day = atoi(first_data.TradingDay);
 	min_bar.open_price = first_data.LastPrice;
@@ -319,6 +451,7 @@ bool CMdBroadCast::initial_md_broadcast(std::vector<std::string>& ins)
 	calculate_thread_.set_data(this);
 	md_ret = calculate_thread_.create_thread(calculate_min_function);
 
+#ifdef _TRADE_TIME_
 	// Start MD Front-End Interface
 	md_api_ = CThostFtdcMdApi::CreateFtdcMdApi("./spi_con/md/"); // 'spi_con' has to already been prepared in advance
 	if (md_api_ != nullptr)
@@ -331,12 +464,17 @@ bool CMdBroadCast::initial_md_broadcast(std::vector<std::string>& ins)
 	{
 		md_ret = false;
 	}
+#else	// _TRADE_TIME_
+	md_ret = initial_fake_tick_data();
+#endif	// _TEST_CODE_
+	
 
 	return md_ret;
 }
 
 void CMdBroadCast::release_md_broadcast()
 {
+#ifdef _TRADE_TIME_
 	// Release MD Front-End Interface
 	if (md_api_ != nullptr)
 	{
@@ -344,6 +482,9 @@ void CMdBroadCast::release_md_broadcast()
 		md_api_->Release();
 		md_api_ = nullptr;
 	}
+#else	// _TRADE_TIME_
+	release_fake_tick_data();
+#endif	// _TEST_CODE_
 
 	// Close Distribution Thread
 	distribute_thread_.set_stop(true);
@@ -409,6 +550,11 @@ void CMdBroadCast::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CT
 void CMdBroadCast::OnRtnDepthMarketData(mtk_data *pDepthMarketData)
 {
 	// Refuse To Block Interface CallBack
-	std::lock_guard<std::mutex> lck(*sub_mutex_);
-	sub_ticks_.emplace_back(*pDepthMarketData);
+
+	if (true/*instrument_trade_time_validation()*/)
+	{
+		std::lock_guard<std::mutex> lck(*sub_mutex_);
+		sub_ticks_.emplace_back(*pDepthMarketData);
+	}
+	
 }

@@ -44,7 +44,7 @@ private:
 	void	print_info(const char* ins_str);
 
 private:
-	bool			connect_md_flag_{ false };
+	bool	connect_md_flag_{ false };
 	
 	std::vector<std::string>		subscribe_inst_;	// Subscribed Instruments
 	std::map<std::string, bool>		mtk_open_;			// Market Open Flag
@@ -58,6 +58,19 @@ private:
 	std::map<std::string, std::vector<mtk_data>>			tick_base_;			// Ticks For Base Data Calculation 
 
 	std::shared_ptr<CMdManager>		manager_pointer;	// Store Minute Data Management
+
+#ifndef _TRADE_TIME_
+	// Fake Function
+	bool initial_fake_tick_data();
+	void release_fake_tick_data();
+
+	void transfer_fake_to_tick_data(int& data_index, int& total_volum, mtk_data& tick);
+	static void distribute_fake_tick_function(void* data);
+
+	// Fake Data
+	std::map<int, std::string> instrument_tick_one_day;
+	CppThread	distribute_fake_thread;
+#endif	// _TEST_CODE_
 
 // MD Interface Business
 public:
@@ -78,6 +91,6 @@ private:
 	void OnRtnDepthMarketData(mtk_data *pDepthMarketData) override;
 
 private:
-	CThostFtdcMdApi* md_api_;
+	CThostFtdcMdApi* md_api_{ nullptr };
 	bool is_ready_subscribe_{ false };
 };

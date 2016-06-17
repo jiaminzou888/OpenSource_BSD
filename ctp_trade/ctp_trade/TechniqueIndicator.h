@@ -22,9 +22,9 @@ public:
 	virtual void attach_parameters(tech_attribute* attr);
 
 	// operation
-	virtual int  get_signal(int date_index, int type, int& reason);
+	virtual int  get_signal(int type, int& reason);
 	virtual bool get_minmax_info(int beg_date, int end_date, double& min_data, double& max_data);
-	virtual double get_last_price(int type);
+	
 
 	// calculation
 	virtual bool calculate(int date_index, int periods, int type, bool use_last, double& data); // Moving Average
@@ -52,14 +52,20 @@ public:
 	void attach_parameters(tech_attribute* attr) override;
 	
 	// operation
-	int  get_signal(int date_index, int type, int& reason)									override;
+	int  get_signal(int type, int& reason)									override;
 	bool get_minmax_info(int beg_date, int end_date, double& min_data, double& max_data)	override;
 	
 	// calculation
 	bool calculate(int date_index, int periods, int type, bool use_last, double& data)      override;
 	
+	// utility
+	bool is_basic_data_ready();
+	double get_limit_price(int type);
 
 private:
+	bool	initial_read_pos_flag{ false };
+	int		candle_bar_read_pos{ 0 };
+
 	ma_attribute attribute;
 };
 

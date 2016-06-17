@@ -7671,7 +7671,5 @@ struct CThostFtdcTradingAccountReserveField
 };
 
 using mtk_data			= CThostFtdcDepthMarketDataField;	// Depth Market Data
-using mtk_data_name		= TThostFtdcInstrumentIDType;		// Instruments ID
-using mtk_data_exchange = TThostFtdcExchangeIDType;			// Exchange ID
 
 #endif

@@ -5,13 +5,14 @@
 int main(int argc, char* argv[])
 {
 	// Create Different Strategies
-	int	ma_data_type = CCandleBar::MIN_FIVE | CCandleBar::MIN_ONE | CCandleBar::MIN_FIVETEEN;
+	// int	ma_data_type = CCandleBar::MIN_FIVE | CCandleBar::MIN_ONE | CCandleBar::MIN_FIVETEEN;
+	int	ma_data_type = CCandleBar::MIN_ONE;
 
 	CMAStrategy ma_stg;
 	ma_stg.initial_ma_stg("E:\\OpenSource_BSD\\ctp_trade\\x64\\Debug\\inst_config.ini", "MA_STG", ma_data_type);
 
 	// Trader Manager
-	CTradeManager trader;;
+	CTradeManager trader;
 	trader.attach_trade_strategy(&ma_stg);
 
 	// Try To Set Strategies List in initial

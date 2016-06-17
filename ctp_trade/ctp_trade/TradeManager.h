@@ -25,7 +25,7 @@ private:
 private:
 	std::string		root_log_;
 
-	std::vector<std::shared_ptr<CppThread>>	stg_threads_;				// Strategies Thread
+	//std::vector<std::shared_ptr<CppThread>>	stg_threads_;	// Strategies Thread
 	std::vector<std::shared_ptr<CStrategy>>	stg_container_;	// Registered Strategies
 	
 

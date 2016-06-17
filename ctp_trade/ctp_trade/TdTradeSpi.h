@@ -22,12 +22,15 @@ public:
 
 	bool initial_td_trade();
 	void release_td_trade();
+
 	void wait_td_event();
 	void notify_td_event();
 	bool get_td_connect_flag();
 
 	int request_user_login();
 	int request_settle_confirm();
+
+	int request_order_insert(CThostFtdcInputOrderField& order_req);
 
 private:
 	bool	connect_td_flag_{ false };

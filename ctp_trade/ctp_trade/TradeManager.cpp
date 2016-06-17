@@ -15,23 +15,6 @@ CTradeManager::CTradeManager()
 	root_log_ = root_log_.substr(0, root_log_.find_last_of("\\")) + "\\glog_log";
 }
 
-void CTradeManager::trade_process_function(void* data)
-{
-	CppThread*		handle_thread	= static_cast<CppThread*>(data);
-	CTradeManager*	handle_trade	= static_cast<CTradeManager*>(handle_thread->get_data());
-
-	while (!handle_thread->is_stop())
-	{
-		// It Could Be Updated When Detach_Stg Happen
-		size_t	thread_id = handle_thread->get_thread_index();
-		// Waiting For Trade Notification
-		
-
-		// Do Something If Getting The Trade Signal
-
-	}
-}
-
 bool CTradeManager::initial_trader()
 {
 	bool trade_ret = true;
@@ -44,10 +27,13 @@ bool CTradeManager::initial_trader()
 	std::vector<std::string> vect;
 	load_all_interested_ins(vect);
 	trade_ret &= md_manager.initial_md_manager(vect);
+#ifdef _TRADE_TIME_
 	trade_ret &= md_manager.subscribe_market();
+#endif	// _TRADE_TIME_
 
 	// td
 	trade_ret &= td_manager.initial_td_manager();
+#ifdef _TRADE_TIME_
 	if (0 == td_manager.execute_login_confirm())
 	{
 		trade_ret &= true;
@@ -56,6 +42,7 @@ bool CTradeManager::initial_trader()
 	{
 		trade_ret &= false;
 	}
+#endif	// _TRADE_TIME_
 
 	return trade_ret;
 }
@@ -75,17 +62,27 @@ void CTradeManager::release_trader()
 void CTradeManager::attach_trade_strategy(CStrategy* stg)
 {
 	// Attach A New Strategy
+	stg->set_td_module(&td_manager);
 	stg_container_.emplace_back(std::shared_ptr<CStrategy>(stg));
+	/*
 	// Open The Corresponding Thread
 	CppThread* stg_thread = new CppThread;
 	stg_thread->set_data(this);
 	stg_thread->set_thread_index(stg_container_.size()+1);
 	stg_thread->create_thread(trade_process_function);
 	stg_threads_.push_back(std::shared_ptr<CppThread>(stg_thread));
+	*/
 }
 
 void CTradeManager::detach_trade_strategy(CStrategy* stg)
 {
+	auto stg_itera = std::find(stg_container_.begin(), stg_container_.end(), std::shared_ptr<CStrategy>(stg));
+	if (stg_itera != stg_container_.end())
+	{
+		stg_container_.erase(stg_itera);
+	}
+
+	/*
 	// Find The Strategy That Will Be Detached
 	int	   stg_index  = 0;
 	auto   stg_iteta  = stg_container_.begin();
@@ -117,6 +114,7 @@ void CTradeManager::detach_trade_strategy(CStrategy* stg)
 		// Detach The Corresponding Strategy.
 		stg_container_.erase(stg_iteta);
 	}
+	*/
 }
 
 void CTradeManager::notify_decision_data(int period, candle_bar& bar)
