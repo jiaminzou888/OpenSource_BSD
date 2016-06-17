@@ -4,6 +4,7 @@
 /ctp_trade/ctp_trade/x64/*
 /ctp_trade/ipch/*
 /ctp_trade/x64/Debug/glog_log/*
+/ctp_trade/x64/Debug/*
 !/ctp_trade/x64/Debug/*.ini
 !/ctp_trade/x64/Debug/*.dll
 !/ctp_trade/x64/Debug/*.csv
