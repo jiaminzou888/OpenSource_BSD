@@ -13,5 +13,6 @@ The Project Intends To Became A Minimal Platform That Would Support Everyone Who
 7. Complete All Different Minute's Period KData Calculation And Push To Registered Strategies, Then Combine MA_Indicator With MA_Strategy And Try To Do Corresponding Action Based On It's Reason.  —— **JUN 8th. 2016.**
 8. Complete Faked rb1610 Data Push And Solved The Problem Of Daytime Function Test Only In Trading Day And Could Send Order Correctly Now.   —— **JUN 14th. 2016.**
 9. **Pause The Private Project To Try To Rewrite VN.PY In C++.**  ——  **JUN 23th. 2016.**
-10.  Because 1. The Private Project Is Just A Practice By Myself And It's So Complicated And Immature. 
-11.          2. VN.PY Is Now A Great Project Community That Followed By Many Interesting People, And I'm Learning Python Now. I Think Rewrite The VN.PY Is Very Helpful For Improving My Capacity Of C++ And Python, Even Trading System Frame.
+	Because 
+	1. The Private Project Is Just A Practice By Myself And It's So Complicated And Immature. 
+	2. VN.PY Is Now A Great Project Community That Followed By Many Interesting People, And I'm Learning Python Now. I Think Rewrite The VN.PY Is Very Helpful For Improving My Capacity Of C++ And Python, Even Trading System Frame.
