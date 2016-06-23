@@ -227,7 +227,7 @@ void CMovingAverage::set_default_parameters()
 	attribute.period_cycle.clear();
 	attribute.period_cycle.push_back(2);
 	attribute.period_cycle.push_back(3);
-	attribute.period_cycle.push_back(5);
+	attribute.period_cycle.push_back(4);
 }
 
 void CMovingAverage::attach_parameters(tech_attribute* attr)
@@ -280,11 +280,11 @@ bool CMovingAverage::calculate(int date_index, int periods, int type, bool use_l
 		{
 			if (0 == date_index)
 			{
-				ma_data = base_kdata->get_price(date_index, type);
+				ma_data = base_kdata->get_safe_price(date_index, type);
 			} 
 			else
 			{
-				ma_data = data*(periods - 1.) / (periods + 1.) + base_kdata->get_price(date_index, type) * 2. / (periods + 1);
+				ma_data = data*(periods - 1.) / (periods + 1.) + base_kdata->get_safe_price(date_index, type) * 2. / (periods + 1);
 			}
 		}
 		else
@@ -293,11 +293,11 @@ bool CMovingAverage::calculate(int date_index, int periods, int type, bool use_l
 			{
 				if (0 == i)
 				{
-					ma_data = base_kdata->get_price(i, type);
+					ma_data = base_kdata->get_safe_price(i, type);
 				}
 				else
 				{
-					ma_data = ma_data*(periods - 1.) / (periods + 1.) + base_kdata->get_price(date_index, type) * 2. / (periods + 1);
+					ma_data = ma_data*(periods - 1.) / (periods + 1.) + base_kdata->get_safe_price(date_index, type) * 2. / (periods + 1);
 				}
 			}
 		}
@@ -347,7 +347,7 @@ bool CMovingAverage::is_basic_data_ready()
 
 double CMovingAverage::get_limit_price(int type)
 {
-	return base_kdata->get_price(candle_bar_read_pos, type);
+	return base_kdata->get_safe_price((candle_bar_read_pos - 1), type);
 }
 
 int  CMovingAverage::get_signal(int type, int& reason)

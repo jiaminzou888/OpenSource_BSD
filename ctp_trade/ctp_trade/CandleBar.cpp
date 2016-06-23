@@ -168,7 +168,7 @@ bool CCandleBar::get_ma(size_t date_index, int periods, int type, double& data)
 
 	for (size_t i = date_index; i >= 0; --i)
 	{
-		ma_data += get_price(date_index, type);
+		ma_data += get_price(i, type);
 		k_count++;
 		if (periods == k_count)
 		{
@@ -180,6 +180,13 @@ bool CCandleBar::get_ma(size_t date_index, int periods, int type, double& data)
 	return false;
 }
 
+double CCandleBar::get_safe_price(size_t date_index, int type)
+{
+	std::lock_guard<std::mutex> lck(*mutex_);
+
+	return get_price(date_index, type);
+}
+
 void CCandleBar::insert_candles_backward(const std::vector<candle_bar>& target)
 {
 	candles_.insert(candles_.end(), target.begin(), target.end());
@@ -187,8 +194,6 @@ void CCandleBar::insert_candles_backward(const std::vector<candle_bar>& target)
 
 double CCandleBar::get_price(size_t date_index, int type)
 {
-	std::lock_guard<std::mutex> lck(*mutex_);
-
 	if (candles_.size() <= date_index)
 	{
 		return 0.0;

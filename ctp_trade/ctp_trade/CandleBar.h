@@ -41,11 +41,14 @@ public:
 	void convert_kdata_and_clear(size_t multiple, CCandleBar& des_candles);
 	// Calculate Moving Average From The Day Pointed By date_index To One periods Forwarded
 	bool get_ma(size_t date_index, int periods, int type, double& data);
-	// Get Specific Type Of Price On One Day
-	double get_price(size_t date_index, int type);
+	// Get Safe Specific Data
+	double get_safe_price(size_t date_index, int type);
 
 private:
+	// insert candles
 	void insert_candles_backward(const std::vector<candle_bar>& target);
+	// Get Specific Type Of Price On One Day
+	double get_price(size_t date_index, int type);
 
 private:
 	int	candle_type;
