@@ -16,5 +16,6 @@ The Project Intends To Became A Minimal Platform That Would Support Everyone Who
 
 ###2. zipline_application: 
 The Project Aims To Figure Out How To Apply Zipline To Chinese Stock Market And Construct An Useful Small Zipline Application.
+#####Release Note:
 1. Downloaded And Installed Anaconda_64bit And CMD "conda install -c Quantopian zipline" To Install Zipline Package. ——  **JUN 28th. 2016.**
 2. Complicated A Zipline's Demo Sample For Localizing Its Trade Simulation System By Hard Disk Data.**  ——  **JUL 1st. 2016.**
