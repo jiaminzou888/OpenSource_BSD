@@ -20,8 +20,9 @@ The Project Aims To Figure Out How To Apply Zipline To Chinese Stock Market And 
 1. Downloaded And Installed Anaconda_64bit And CMD "conda install -c Quantopian zipline" To Install Zipline Package. ——  **JUN 28th. 2016.**
 2. Complicated A Zipline's Demo Sample For Localizing Its Trade Simulation System By Hard Disk Data.**  ——  **JUL 1st. 2016.**
 
-###3. main_trade:
-The Project Intends To Rewrite VNPY In Python To Main_Trade In C++ Which Just Support CTP Temporarily, And We Plans To Open It Later When Finishing The CTA Engine.
+###3. main_trade:(Platform: VS2013 Ultimate + QT5.3.2)
+The Project Intends To Rewrite VNPY In Python To Main_Trade In C++ Which Just Support CTP Temporarily, And I Finished The CTA Engine And Open Source Code Now.
 #####Release Note:
-1. Completed The First Version Trading System, In Which You Can Trade CTP's Instruments Manually. A little Bit Of Exciting Actually, AHa! **  ——  **JUL 26st. 2016.**
-
+1. Completed The First Version Trading System, In Which You Can Trade CTP's Instruments Manually. A little Bit Of Exciting Actually, AHa! **  ——  **JUL 26th. 2016.**
+2. Completed The Second Version And Passed The Basic Test, So I Think It's Could Be Used By People Who Are Interested In It. **  ——  **Jan 15th. 2017.**
+3. You Just Need To Download Original Code And Run MainTrade.sln To Use It.**  ——  **Jan 15th. 2017.**
